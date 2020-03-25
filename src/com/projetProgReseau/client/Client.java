@@ -12,12 +12,12 @@ import com.projetProgReseau.view.ViewConnexion;
 
 public class Client implements Runnable {
 	
+	private static final String DECONNEXION = "DECONNEXION"; 
+
 	private Socket connexion;
 	private PrintWriter sortie;
 	private DataInputStream entree;
-	
 	private String nom;
-
 
 
 	public Client(String nomServ, int port) {
@@ -35,7 +35,6 @@ public class Client implements Runnable {
 
 	private void envoyer() {
 		Thread envoyer = new Thread(new Runnable() {
-			String msg = "";
 			
             @Override
             public void run() {
@@ -54,15 +53,23 @@ public class Client implements Runnable {
 	
 	private void recevoir() {
 		Thread recevoir = new Thread(new Runnable() {
-            String msg;
+            String msg = "";
+            
             @Override
             public void run() {
-            	
-            	while(true) {
+            	try {
             		
-            	}
-            	
-//               fermeture();
+            		
+	            	while(!msg.equals(DECONNEXION)) {
+						msg = entree.readUTF();
+						
+						System.out.println(msg);
+	            	}
+	            	
+	            	fermeture();
+            	} catch (IOException e) {
+					e.printStackTrace();
+				}
             }
         });
         recevoir.start();
