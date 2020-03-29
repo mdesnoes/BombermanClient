@@ -1,26 +1,44 @@
 package com.projetProgReseau.client;
 
 import java.io.DataInputStream;
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.net.UnknownHostException;
 
-import com.projetProgReseau.view.ViewConnexion;
+import com.projetBomberman.modele.BombermanGame;
+import com.projetBomberman.modele.ModeJeu;
+import com.projetBomberman.strategy.BreakWallStrategy;
+import com.projetBomberman.strategy.EsquiveStrategy;
+import com.projetBomberman.strategy.PutBombStrategy;
+import com.projetBomberman.strategy.RandomStrategy;
+import com.projetBomberman.strategy.Strategy;
+
 
 
 public class Client implements Runnable {
 	
-	private static final String DECONNEXION = "DECONNEXION"; 
+	/* A passée en paramètre du client lorsque le serveur sera adapté pour tous les modes de jeu */
+	private static final ModeJeu MODE_JEU = ModeJeu.SOLO;
+	
+	private static final String RANDOM_STRATEGY = "random";
+	private static final String PUT_BOMB_STRATEGY = "put_bomb";
+	private static final String BREAK_WALL_STRATEGY = "break_wall";
+	private static final String ESQUIVE_STRATEGY = "esquive";
+	
 
 	private Socket connexion;
 	private PrintWriter sortie;
 	private DataInputStream entree;
 	private String nom;
 
+	private Strategy strategyAgent;
+	private int maxturn;
+	private BombermanGame game;
 
-	public Client(String nomServ, int port) {
+	public Client(String nomServ, int port, String strategyAgent, int maxturn) {
+		this.maxturn = maxturn;
+		this.strategyAgent = initStrategyAgent(strategyAgent);
+		
 		// Creation de la connexion et des entrees/sorties
 		try {
 			this.connexion = new Socket(nomServ, port);
@@ -39,7 +57,7 @@ public class Client implements Runnable {
             @Override
             public void run() {
             	
-            	ViewConnexion view = new ViewConnexion(Client.this);
+            	//ViewConnexion view = new ViewConnexion(Client.this);
             	
             	while(true) {
             		
@@ -58,15 +76,16 @@ public class Client implements Runnable {
             @Override
             public void run() {
             	try {
+            		nom = entree.readUTF();
             		
+        			game = new BombermanGame(sortie, nom, MODE_JEU, strategyAgent, maxturn);
             		
-	            	while(!msg.equals(DECONNEXION)) {
-						msg = entree.readUTF();
+	            	while(true) {
+						 msg = entree.readUTF();
 						
-						System.out.println(msg);
+//						System.out.println(msg);
 	            	}
 	            	
-	            	fermeture();
             	} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -92,10 +111,16 @@ public class Client implements Runnable {
 		}
 	}
 	
-	
-	public PrintWriter getSortie() {
-		return sortie;
+	private Strategy initStrategyAgent(String strategyAgent) {
+		switch(strategyAgent) {
+			case RANDOM_STRATEGY: return new RandomStrategy();
+			case PUT_BOMB_STRATEGY: return new PutBombStrategy();
+			case BREAK_WALL_STRATEGY: return new BreakWallStrategy();
+			case ESQUIVE_STRATEGY: return new EsquiveStrategy();
+			default: return new RandomStrategy();
+		}
 	}
+
 	public String getNom() {
 		return nom;
 	}
@@ -105,15 +130,19 @@ public class Client implements Runnable {
 	
 	public static void main(String[] argu) {
 
-		if (argu.length == 2) { // on récupère les paramètres
+		if (argu.length == 4) {
+			
 			String s = argu[0];
 			int p = Integer.parseInt(argu[1]);
+			String strategy = argu[2];
+			int maxturn = Integer.parseInt(argu[3]);
 			
-			Client c1 = new Client(s, p);
+			Client c1 = new Client(s, p, strategy, maxturn);
 			Thread t = new Thread(c1);
 			t.start();
+			
 		} else {
-			System.out.println("syntaxe d’appel : java client serveur port \n");
+			System.out.println("syntaxe d’appel : java client serveur port strategie_des_agents nombre_max_de_tour\n");
 		} 
 		
 	}
