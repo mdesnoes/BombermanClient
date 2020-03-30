@@ -2,7 +2,6 @@ package com.projetBomberman.modele;
 
 import java.util.ArrayList;
 
-import com.projetBomberman.perceptron.SparseVector;
 import com.projetBomberman.strategy.Strategy;
 
 public class AgentBomberman extends Agent {
@@ -44,13 +43,6 @@ public class AgentBomberman extends Agent {
 				}
 			}
 		}
-	}
-	
-	
-	
-	public SparseVector encoderCoupleEtatAction(SparseVector v, AgentAction action) {
-		
-		return v;
 	}
 	
 	public boolean isLegalMove(BombermanGame bombGame, AgentAction action) {

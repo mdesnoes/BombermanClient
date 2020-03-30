@@ -11,6 +11,7 @@ import com.projetBomberman.factory.FactoryProvider;
 import com.projetBomberman.strategy.*;
 import com.projetBomberman.view.InfoAgent;
 import com.projetBomberman.view.ViewGagnant;
+import com.projetProgReseau.client.Client;
 
 
 public class BombermanGame extends Game {
@@ -40,12 +41,13 @@ public class BombermanGame extends Game {
 	private AgentBomberman bombermanJoueur2;
 	private PrintWriter sortie;
 	
-	public BombermanGame(PrintWriter sortie, String nomJoueur, ModeJeu mode, Strategy agentStrategy, int maxturn) {
+	
+	public BombermanGame(Client client, ModeJeu mode, Strategy agentStrategy, int maxturn) {
 		super(maxturn);
-		this.sortie = sortie;
-		this.nomJoueur = nomJoueur;
+		this.sortie = client.getSortie();
+		this.nomJoueur = client.getNom();
 		this.mode = mode;
-		this._controllerBombGame = new ControllerBombermanGame(this, sortie);
+		this._controllerBombGame = new ControllerBombermanGame(this, client);
 		this.agentStrategy = agentStrategy;
 	}
 
@@ -96,13 +98,13 @@ public class BombermanGame extends Game {
 		}
 		
 		this.bombermanJoueur1 = this._listAgentsBomberman.get(0);
-		this.bombermanJoueur2 = this._listAgentsBomberman.get(1);
 		//En mode solo, on contrôle le premier agent
 		if(this.mode == ModeJeu.SOLO) {
 			this.bombermanJoueur1.setStrategy(new InteractifStrategyCommande1());
 		}
 		//En mode duo ou duel, on peut controler les deux premiers agents (avec des touches différentes)
 		else if(this.mode == ModeJeu.DUO || this.mode == ModeJeu.DUEL) {
+			this.bombermanJoueur2 = this._listAgentsBomberman.get(1);
 			this.bombermanJoueur1.setStrategy(new InteractifStrategyCommande1());
 			this.bombermanJoueur2.setStrategy(new InteractifStrategyCommande2());
 		}

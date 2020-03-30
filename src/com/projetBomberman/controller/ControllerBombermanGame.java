@@ -11,6 +11,7 @@ import com.projetBomberman.view.Map;
 import com.projetBomberman.view.ViewBombermanGame;
 import com.projetBomberman.view.ViewCommand;
 import com.projetBomberman.view.ViewModeInteractif;
+import com.projetProgReseau.client.Client;
 
 public class ControllerBombermanGame implements InterfaceController {
 
@@ -19,11 +20,12 @@ public class ControllerBombermanGame implements InterfaceController {
 	private ViewBombermanGame _viewBombGame;
 	private ViewModeInteractif _viewModeInteractif;
 	private PrintWriter sortie;
+	private Client client;
 	
-	
-	public ControllerBombermanGame(BombermanGame bombGame, PrintWriter sortie) {
+	public ControllerBombermanGame(BombermanGame bombGame, Client client) {
 		this._bombGame = bombGame;
-		this.sortie = sortie;
+		this.client = client;
+		this.sortie = client.getSortie();
 		
 		createView();
 	}
@@ -65,6 +67,7 @@ public class ControllerBombermanGame implements InterfaceController {
 		}
 		
 		this.sortie.println("[CLIENT : " + this._bombGame.getNomJoueur() + "] DECONNEXION");
+		this.client.fermeture();
 	}
 
 	

@@ -1,9 +1,11 @@
 package com.projetProgReseau.client;
 
 import java.io.DataInputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.SocketException;
 
 import com.projetBomberman.modele.BombermanGame;
 import com.projetBomberman.modele.ModeJeu;
@@ -56,10 +58,8 @@ public class Client implements Runnable {
 			
             @Override
             public void run() {
-            	
-            	//ViewConnexion view = new ViewConnexion(Client.this);
-            	
-            	while(true) {
+            	            	
+            	while(!connexion.isClosed()) {
             		
             	}
             	
@@ -78,15 +78,20 @@ public class Client implements Runnable {
             	try {
             		nom = entree.readUTF();
             		
-        			game = new BombermanGame(sortie, nom, MODE_JEU, strategyAgent, maxturn);
+            		/* Creation du jeu bomberman */
+        			game = new BombermanGame(Client.this, MODE_JEU, strategyAgent, maxturn);
             		
-	            	while(true) {
+	            	while(!connexion.isClosed()) {
 						 msg = entree.readUTF();
 						
-//						System.out.println(msg);
+						System.out.println(msg);
 	            	}
-	            	
-            	} catch (IOException e) {
+            	} catch(EOFException e) {
+             	   System.out.println("Le serveur est fermé !");
+             	   fermeture();
+            	} catch(SocketException e) {
+            		System.out.println("Connexion fermée !");
+                } catch (IOException e) {
 					e.printStackTrace();
 				}
             }
@@ -100,7 +105,7 @@ public class Client implements Runnable {
 		recevoir();
 	}
 	
-	private void fermeture() {
+	public void fermeture() {
 		try {
 	    	entree.close();
 	    	sortie.close();
@@ -127,7 +132,14 @@ public class Client implements Runnable {
 	public void setNom(String nom) {
 		this.nom = nom;
 	}
-	
+	public PrintWriter getSortie() {
+		return sortie;
+	}
+	public void setSortie(PrintWriter sortie) {
+		this.sortie = sortie;
+	}
+
+
 	public static void main(String[] argu) {
 
 		if (argu.length == 4) {

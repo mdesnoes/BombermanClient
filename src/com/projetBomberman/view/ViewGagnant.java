@@ -65,6 +65,7 @@ public class ViewGagnant extends JFrame {
 		
 		buttonFermer.addActionListener(evenement -> {
 			contBombGame.quitter();
+			setVisible(false);
 		});
 		panelPrincipal.add(panelButton);
 		
