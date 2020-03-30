@@ -1,7 +1,9 @@
 package com.projetBomberman.modele;
 
 import java.io.PrintWriter;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 
 import com.projetBomberman.controller.ControllerBombermanGame;
 import com.projetBomberman.factory.AgentFactory;
@@ -30,12 +32,17 @@ public class BombermanGame extends Game {
 	private ArrayList<Bombe> _listBombesDetruite = new ArrayList<>();
 	private ArrayList<Item> _listItemsUtilise = new ArrayList<>();
 	private int reward = 0;
-	private Strategy agentStrategy;	
-	private String nomJoueur;
+	private Strategy agentStrategy;
 	
-
+	private Timestamp dateDebutPartie;
+	private String nomJoueur;
+	private AgentBomberman bombermanJoueur1;
+	private AgentBomberman bombermanJoueur2;
+	private PrintWriter sortie;
+	
 	public BombermanGame(PrintWriter sortie, String nomJoueur, ModeJeu mode, Strategy agentStrategy, int maxturn) {
 		super(maxturn);
+		this.sortie = sortie;
 		this.nomJoueur = nomJoueur;
 		this.mode = mode;
 		this._controllerBombGame = new ControllerBombermanGame(this, sortie);
@@ -43,6 +50,9 @@ public class BombermanGame extends Game {
 	}
 
 	public void initialize_game() {
+		Date dateCourante = new Date();
+		this.dateDebutPartie = new Timestamp(dateCourante.getTime());
+		
 		System.out.println("Le jeu est initialisé");
 		this._listAgentsBomberman = new ArrayList<>();
 		this._listAgentsPNJ = new ArrayList<>();
@@ -85,14 +95,16 @@ public class BombermanGame extends Game {
 			System.out.println(agent.getX() + " - " + agent.getY() + " type : " + agent.getType());
 		}
 		
+		this.bombermanJoueur1 = this._listAgentsBomberman.get(0);
+		this.bombermanJoueur2 = this._listAgentsBomberman.get(1);
 		//En mode solo, on contrôle le premier agent
 		if(this.mode == ModeJeu.SOLO) {
-			this._listAgentsBomberman.get(0).setStrategy(new InteractifStrategyCommande1());
+			this.bombermanJoueur1.setStrategy(new InteractifStrategyCommande1());
 		}
 		//En mode duo ou duel, on peut controler les deux premiers agents (avec des touches différentes)
 		else if(this.mode == ModeJeu.DUO || this.mode == ModeJeu.DUEL) {
-			this._listAgentsBomberman.get(0).setStrategy(new InteractifStrategyCommande1());
-			this._listAgentsBomberman.get(1).setStrategy(new InteractifStrategyCommande2());
+			this.bombermanJoueur1.setStrategy(new InteractifStrategyCommande1());
+			this.bombermanJoueur2.setStrategy(new InteractifStrategyCommande2());
 		}
 		
 		
@@ -212,19 +224,31 @@ public class BombermanGame extends Game {
 	public void gameOver() {
 		System.out.println("Fin du jeu");
 		
+		String vainqueur = "";
+		
 		if(this._listAgentsBomberman.size() <= 0) {
 			System.out.println("Victoire des agents PNJ !");
 			if(this.mode != ModeJeu.PERCEPTRON) {
-				ViewGagnant viewGagnant = ViewGagnant.getInstance(this._controllerBombGame, "PNJ", "");
+				ViewGagnant.getInstance(this._controllerBombGame, "PNJ", "");
 			}
+			vainqueur = "PNJ";
 		}
 		else if(this._listAgentsBomberman.size() == 1) {
-			System.out.println("Victoire de l'agent '" + this._listAgentsBomberman.get(0).getColor() + "'");
+			AgentBomberman bombermanVainqueur = this._listAgentsBomberman.get(0);
+			System.out.println("Victoire de l'agent '" + bombermanVainqueur.getColor() + "'");
 			if(this.mode != ModeJeu.PERCEPTRON) {
-				String color = colorAgentToColor(this._listAgentsBomberman.get(0).getColor());
-				ViewGagnant viewGagnant = ViewGagnant.getInstance(this._controllerBombGame, this._listAgentsBomberman.get(0).getColor().toString(), color);
+				String color = colorAgentToColor(bombermanVainqueur.getColor());
+				ViewGagnant.getInstance(this._controllerBombGame, bombermanVainqueur.getColor().toString(), color);
+			}
+			
+			if(bombermanVainqueur == this.bombermanJoueur1) {
+				vainqueur = this.nomJoueur;
+			} else {
+				vainqueur = "PNJ";
 			}
 		}
+		
+		this.sortie.println("FIN_PARTIE > " + this.dateDebutPartie + ";" + vainqueur);		
 	}
 	
 	public String colorAgentToColor(ColorAgent colorAgent) {
