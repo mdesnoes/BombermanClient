@@ -33,12 +33,10 @@ public class AgentBomberman extends Agent {
 			if(this.isLegalMove(bombermanGame, action)) {
 				this.moveAgent(action);
 				
-				if(bombermanGame.getModeJeu() != ModeJeu.PERCEPTRON) {
-					for(Item item : bombermanGame.getListItem()) {
-						if(this.getX() == item.getX() && this.getY() == item.getY()) {
-							this.takeItem(item);
-							bombermanGame.addListItemUtilise(item);
-						}
+				for(Item item : bombermanGame.getListItem()) {
+					if(this.getX() == item.getX() && this.getY() == item.getY()) {
+						this.takeItem(item);
+						bombermanGame.addListItemUtilise(item);
 					}
 				}
 			}

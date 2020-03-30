@@ -11,6 +11,9 @@ import java.util.Observer;
 
 public class ViewBombermanGame extends JFrame implements Observer {
 
+	private static final long serialVersionUID = 1L;
+	private static final String EXT_LAYOUT = ".lay";
+
 	private Map _map;
 	private PanelBomberman _panel;
 	private ControllerBombermanGame _controllerGame;
@@ -32,7 +35,7 @@ public class ViewBombermanGame extends JFrame implements Observer {
 		int dy = centerPoint.y - windowSize.height / 2 - 600;
 		this.setLocation(dx,dy);
 
-		if(this._controllerGame.getLayout() != null && this._controllerGame.getLayout().endsWith(".lay")) {
+		if(this._controllerGame.getLayout() != null && this._controllerGame.getLayout().endsWith( EXT_LAYOUT )) {
 			try {
 				this._map = new Map("layout/" + this._controllerGame.getLayout());
 			} catch (Exception e) {

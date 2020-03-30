@@ -16,10 +16,11 @@ import com.projetProgReseau.client.Client;
 
 public class BombermanGame extends Game {
 
-	private final static int TURN_MAX_ITEM = 5;
-	private final static int PROBABILITE_OBJET = 6;
-	private final static int MAX_RAJION_RADIO_TOWER = 10;
+	private static final int TURN_MAX_ITEM = 5;
+	private static final int MAX_RAJION_RADIO_TOWER = 10;
 	
+	private static final char RAIJON = 'R';
+	private static final char BOMBERMAN = 'B';
 	
 	private ModeJeu mode;
 	private ControllerBombermanGame _controllerBombGame;
@@ -32,7 +33,6 @@ public class BombermanGame extends Game {
 	private ArrayList<Agent> _listAgentsDetruit = new ArrayList<>();
 	private ArrayList<Bombe> _listBombesDetruite = new ArrayList<>();
 	private ArrayList<Item> _listItemsUtilise = new ArrayList<>();
-	private int reward = 0;
 	private Strategy agentStrategy;
 	
 	private Timestamp dateDebutPartie;
@@ -82,16 +82,11 @@ public class BombermanGame extends Game {
 		for(InfoAgent agent : listAgentInit) {
 			AgentFactory agentFactory = FactoryProvider.getFactory(agent.getType());
 
-			if(agent.getType() == 'B') {
-			    this._listAgentsBomberman.add((AgentBomberman) agentFactory.createAgent(agent.getX(), agent.getY(), agent.getType(), agentStrategy));
+			if(agent.getType() == BOMBERMAN) {
+			    this._listAgentsBomberman.add((AgentBomberman) agentFactory.createAgent(agent.getX(), agent.getY(), agent.getType(), this.agentStrategy));
 			}
 			else {
-				Strategy strategy = null;
-				//En mode PERCEPTRON, tout les ennemis sont en mode Random
-				if(this.mode == ModeJeu.PERCEPTRON) {
-					strategy = new RandomStrategy();
-				}
-		    	this._listAgentsPNJ.add((AgentPNJ) agentFactory.createAgent(agent.getX(), agent.getY(), agent.getType(), strategy));
+		    	this._listAgentsPNJ.add((AgentPNJ) agentFactory.createAgent(agent.getX(), agent.getY(), agent.getType(), null));
 			}
 
 			System.out.println(agent.getX() + " - " + agent.getY() + " type : " + agent.getType());
@@ -101,8 +96,7 @@ public class BombermanGame extends Game {
 		//En mode solo, on contrôle le premier agent
 		if(this.mode == ModeJeu.SOLO) {
 			this.bombermanJoueur1.setStrategy(new InteractifStrategyCommande1());
-		}
-		//En mode duo ou duel, on peut controler les deux premiers agents (avec des touches différentes)
+		} //En mode duo ou duel, on peut controler les deux premiers agents (avec des touches différentes)
 		else if(this.mode == ModeJeu.DUO || this.mode == ModeJeu.DUEL) {
 			this.bombermanJoueur2 = this._listAgentsBomberman.get(1);
 			this.bombermanJoueur1.setStrategy(new InteractifStrategyCommande1());
@@ -145,7 +139,7 @@ public class BombermanGame extends Game {
 				}
 			}
 
-			//On effectuer l'action du bomberman
+			//On effectue l'action du bomberman
 			agentBomberman.executer(this);
 		}
 
@@ -186,9 +180,9 @@ public class BombermanGame extends Game {
 			if(this._turn % 4 == 0) {
 				//Il peut y avoir que 10 rajions maximum
 				if(rd.getListRaijon().size() < MAX_RAJION_RADIO_TOWER) {
-					AgentFactory agentFactory = FactoryProvider.getFactory('R');
+					AgentFactory agentFactory = FactoryProvider.getFactory(RAIJON);
 					
-					Agent rajion = agentFactory.createAgent(rd.getX(), rd.getY(), 'R', null);
+					Agent rajion = agentFactory.createAgent(rd.getX(), rd.getY(), RAIJON, null);
 					this._listAgentsPNJ.add((AgentPNJ) rajion);
 					
 					rd.addListRajion((AgentRajion) rajion);
@@ -226,27 +220,24 @@ public class BombermanGame extends Game {
 	public void gameOver() {
 		System.out.println("Fin du jeu");
 		
-		String vainqueur = "";
+		String vainqueur;
 		
 		if(this._listAgentsBomberman.size() <= 0) {
 			System.out.println("Victoire des agents PNJ !");
-			if(this.mode != ModeJeu.PERCEPTRON) {
-				ViewGagnant.getInstance(this._controllerBombGame, "PNJ", "");
-			}
+			ViewGagnant.getInstance(this._controllerBombGame, "PNJ", "");
 			vainqueur = "PNJ";
 		}
-		else if(this._listAgentsBomberman.size() == 1) {
+		else {
 			AgentBomberman bombermanVainqueur = this._listAgentsBomberman.get(0);
 			System.out.println("Victoire de l'agent '" + bombermanVainqueur.getColor() + "'");
-			if(this.mode != ModeJeu.PERCEPTRON) {
-				String color = colorAgentToColor(bombermanVainqueur.getColor());
-				ViewGagnant.getInstance(this._controllerBombGame, bombermanVainqueur.getColor().toString(), color);
-			}
+			
+			String color = colorAgentToColor(bombermanVainqueur.getColor());
+			ViewGagnant.getInstance(this._controllerBombGame, bombermanVainqueur.getColor().toString(), color);
 			
 			if(bombermanVainqueur == this.bombermanJoueur1) {
 				vainqueur = this.nomJoueur;
 			} else {
-				vainqueur = "PNJ";
+				vainqueur = "IA";
 			}
 		}
 		
@@ -288,7 +279,6 @@ public class BombermanGame extends Game {
 				return agent;
 			}
 		}
-
 		return null;
 	}
 	// Recupere l'agent Bomberman en fonction des coordonnées passées en paramètre
@@ -366,20 +356,11 @@ public class BombermanGame extends Game {
 	public ArrayList<RadioTower> getListRadioTower() {
 		return this._listRadioTower;
 	}
-	public int getProbabiliteObjet() {
-		return PROBABILITE_OBJET;
-	}
 	public ControllerBombermanGame getControllerBombGame() {
 		return this._controllerBombGame;
 	}
 	public ModeJeu getModeJeu() {
 		return this.mode;
-	}
-	public int getReward() {
-		return this.reward;
-	}
-	public void setReward(int reward) {
-		this.reward = reward;
 	}
 	public String getNomJoueur() {
 		return nomJoueur;

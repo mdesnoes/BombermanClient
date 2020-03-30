@@ -14,8 +14,15 @@ import java.util.Observer;
 
 public class ViewCommand extends JFrame implements Observer {
 
-	private final static int SPEEDMIN = 1;		// Vitesse minimum des tours
-	private final static int SPEEDMAX = 10;		// Vitesse maximum des tours
+	private static final long serialVersionUID = 1L;
+	
+	private static final int SPEED_MIN = 1;		// Vitesse minimum des tours
+	private static final int SPEED_MAX = 10;		// Vitesse maximum des tours
+	private static final String EXT_LAYOUT = ".lay";
+	private static final String REP_LAYOUT = "./layout";
+	private static final String REP_ICONES = "./icones";
+
+	
 	private JLabel _labelTurn;					// Le label qui affiche le tour courant
 	private JSlider _slider;					// Le slider qui affiche la vitesse des tours en seconde
 	private ControllerBombermanGame _controllerGame;
@@ -38,25 +45,25 @@ public class ViewCommand extends JFrame implements Observer {
 		this.setLocation(dx,dy);
 		
 		JFileChooser fc = new JFileChooser();
-		fc.setCurrentDirectory(new java.io.File("./layout"));
+		fc.setCurrentDirectory(new java.io.File( REP_LAYOUT ));
 		fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 
 		if(fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
 			this._layoutGame = fc.getSelectedFile().getName();
 		}
 
-		if(this._layoutGame != null && this._layoutGame.endsWith(".lay")) {
+		if(this._layoutGame != null && this._layoutGame.endsWith( EXT_LAYOUT )) {
 			JPanel panelPrincipal = new JPanel();
 			panelPrincipal.setLayout(new GridLayout(2,1));
 			JPanel panelButton = new JPanel();		
 			panelButton.setLayout(new GridLayout(1,4));
-			Icon icon_restart = new ImageIcon("./icones/icon_restart.png");
+			Icon icon_restart = new ImageIcon(REP_ICONES + "/icon_restart.png");
 			JButton buttonRestart = new JButton(icon_restart);
-			Icon icon_run = new ImageIcon("./icones/icon_run.png");
+			Icon icon_run = new ImageIcon(REP_ICONES + "/icon_run.png");
 			JButton buttonRun = new JButton(icon_run);
-			Icon icon_step = new ImageIcon("./icones/icon_step.png");
+			Icon icon_step = new ImageIcon(REP_ICONES + "/icon_step.png");
 			JButton buttonStep = new JButton(icon_step);
-			Icon icon_stop = new ImageIcon("./icones/icon_pause.png");
+			Icon icon_stop = new ImageIcon(REP_ICONES + "/icon_pause.png");
 			JButton buttonStop = new JButton(icon_stop);
 			
 			//Permet d'appeler le controleur afin d'initialiser le jeu
@@ -110,11 +117,11 @@ public class ViewCommand extends JFrame implements Observer {
 			JLabel labelSlider = new JLabel("Number of turns par second");
 			labelSlider.setHorizontalAlignment(JLabel.CENTER);
 			panelSlider.add(labelSlider);
-			this._slider = new JSlider(JSlider.HORIZONTAL,SPEEDMIN,SPEEDMAX,SPEEDMIN);
+			this._slider = new JSlider(JSlider.HORIZONTAL,SPEED_MIN,SPEED_MAX,SPEED_MIN);
 			this._slider.setPaintTicks(true);
 			this._slider.setPaintLabels(true);
-			this._slider.setMinorTickSpacing(SPEEDMIN);
-			this._slider.setMajorTickSpacing(SPEEDMIN);
+			this._slider.setMinorTickSpacing(SPEED_MIN);
+			this._slider.setMajorTickSpacing(SPEED_MIN);
 			this._slider.setValue((int)this._controllerGame.getTime()/1000);
 
 			//Permet d'appeler le constructeur afin de modifier le temps des tours
@@ -150,7 +157,7 @@ public class ViewCommand extends JFrame implements Observer {
 	public String[] getLayouts() {
 		File repertoire = new File(System.getProperty("user.dir") + "/layout");
 		
-		FilenameFilter layoutFilter = (dir, name) -> name.endsWith(".lay");
+		FilenameFilter layoutFilter = (dir, name) -> name.endsWith( EXT_LAYOUT );
 		
 		File[] files = repertoire.listFiles(layoutFilter);
 		assert files != null;

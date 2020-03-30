@@ -2,6 +2,9 @@ package com.projetBomberman.modele;
 
 public class Bombe {
 	
+	private static final int PROBABILITE_OBJET = 6;
+	private static final int VAL_OBJET_APPARITION = 1;
+	private static final ItemType[] TAB_ITEM = {ItemType.FIRE_UP,ItemType.FIRE_DOWN,ItemType.BOMB_UP,ItemType.BOMB_DOWN,ItemType.FIRE_SUIT,ItemType.SKULL}; 
 	private int _pos_x;
 	private int _pos_y;
 	private int _range;
@@ -14,45 +17,8 @@ public class Bombe {
 		this._stateBomb = stateBomb;
 	}
 	
-	public int getX() {
-		return this._pos_x;
-	}
-
-	public int getY() {
-		return this._pos_y;
-	}
-
-	public int getRange() {
-		return this._range;
-	}
 	
-	void setRange(int range) {
-		if(range > 1) {
-			this._range = range;
-		}
-	}
-
-	public StateBomb getStateBomb() {
-		return this._stateBomb;
-	}
-
-	private void changeStateBomb() {
-		switch(this._stateBomb) {
-			case Step1:
-				this._stateBomb = StateBomb.Step2;
-				break;
-			case Step2:
-				this._stateBomb = StateBomb.Step3;
-				break;
-			case Step3:
-				this._stateBomb = StateBomb.Boom;
-				break;
-			case Boom:
-				break;
-		}
-	}
-	
-	void explosion(BombermanGame bombermanGame) {
+	public void explosion(BombermanGame bombermanGame) {
 		AgentBomberman agentBomberman = bombermanGame.getAgentBombermanByBomb(this);
 		
 		//Si agentBomberman != null, cela veut dire que la bombe appartient à un agent
@@ -89,15 +55,13 @@ public class Bombe {
 			if(bombermanGame.appartientMap(i, this._pos_y)) { // On verifie que les coordonnées appartiennent à la map
 				if(bombermanGame.getListBreakableWall()[i][this._pos_y]) { // On regarde si il y a un mur au coordonnées courante
 					bombermanGame.getListBreakableWall()[i][this._pos_y] = false;
-					bombermanGame.setReward(bombermanGame.getReward() + 10);
 					
-					//Probabilité qu'un item apparaisse (1 chance sur 10), tout les items on la meme probabilite
-					int nb = (int) (Math.random() * bombermanGame.getProbabiliteObjet());
+					//Probabilité qu'un item apparaisse, tout les items on la meme probabilité
+					int nb = (int) (Math.random() * PROBABILITE_OBJET);
 
-					if(nb == 1) {
-						ItemType[] tabItem = {ItemType.FIRE_UP,ItemType.FIRE_DOWN,ItemType.BOMB_UP,ItemType.BOMB_DOWN,ItemType.FIRE_SUIT,ItemType.SKULL}; 
-						int nbRandom = (int) (Math.random() * tabItem.length);
-						Item item = new Item(i, this._pos_y, tabItem[nbRandom]);
+					if(nb == VAL_OBJET_APPARITION) {
+						int nbRandom = (int) (Math.random() * TAB_ITEM.length);
+						Item item = new Item(i, this._pos_y, TAB_ITEM[nbRandom]);
 						bombermanGame.addListItems(item);
 					}
 				}
@@ -109,21 +73,20 @@ public class Bombe {
 			if(bombermanGame.appartientMap(this._pos_x, i)) {
 				if(bombermanGame.getListBreakableWall()[this._pos_x][i]) {
 					bombermanGame.getListBreakableWall()[this._pos_x][i] = false;
-					bombermanGame.setReward(bombermanGame.getReward() + 10);
 
-					//Probabilité qu'un item apparaisse (1 chance sur 10)
-					int nb = (int) (Math.random() * bombermanGame.getProbabiliteObjet());
+					//Probabilité qu'un item apparaisse, tout les items on la meme probabilité
+					int nb = (int) (Math.random() * PROBABILITE_OBJET);
 
-					if(nb == 1) {
-						ItemType[] tabItem = {ItemType.FIRE_UP,ItemType.FIRE_DOWN,ItemType.BOMB_UP,ItemType.BOMB_DOWN,ItemType.FIRE_SUIT,ItemType.SKULL}; 
-						int nbRandom = (int) (Math.random() * tabItem.length);
-						Item item = new Item(this._pos_x, i, tabItem[nbRandom]);
+					if(nb == VAL_OBJET_APPARITION) {
+						int nbRandom = (int) (Math.random() * TAB_ITEM.length);
+						Item item = new Item(this._pos_x, i, TAB_ITEM[nbRandom]);
 						bombermanGame.addListItems(item);
 					}
 				}
 			}
 		}
 	}
+	
 
 	private void destroyAgent(AgentBomberman agentProprietaireBomb, BombermanGame bombermanGame) {
 		//Sur la ligne 
@@ -143,7 +106,6 @@ public class Bombe {
 					}
 
 					bombermanGame.addListAgentDetruit(agent);
-					bombermanGame.setReward(bombermanGame.getReward() + 50);
 				}
 			}
 		}
@@ -165,10 +127,47 @@ public class Bombe {
 					}
 
 					bombermanGame.addListAgentDetruit(agent);
-					bombermanGame.setReward(bombermanGame.getReward() + 50);
 				}
 			}
 		}
+	}
+	
+	
+	
+	private void changeStateBomb() {
+		switch(this._stateBomb) {
+			case Step1:
+				this._stateBomb = StateBomb.Step2;
+				break;
+			case Step2:
+				this._stateBomb = StateBomb.Step3;
+				break;
+			case Step3:
+				this._stateBomb = StateBomb.Boom;
+				break;
+			case Boom:
+				break;
+		}
+	}
+	
+	
+	
+	public int getX() {
+		return this._pos_x;
+	}
+	public int getY() {
+		return this._pos_y;
+	}
+	public int getRange() {
+		return this._range;
+	}
+	public void setRange(int range) {
+		if(range > 1) {
+			this._range = range;
+		}
+	}
+	public StateBomb getStateBomb() {
+		return this._stateBomb;
 	}
 
 }

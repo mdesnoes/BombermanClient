@@ -26,14 +26,14 @@ public class RadioTower {
 		this.listRaijons.clear();
 	}
 
+	
+	
 	public int getX() {
 		return x;
 	}
-
 	public int getY() {
 		return y;
 	}
-	
 	public ArrayList<AgentRajion> getListRaijon() {
 		return this.listRaijons;
 	}

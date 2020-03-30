@@ -31,11 +31,8 @@ public class ControllerBombermanGame implements InterfaceController {
 	}
 	
 	public void createView() {
-		// En mode PERCEPTRON, on n'affiche pas les views (pour faire les simulations)
-		if(this._bombGame.getModeJeu() != ModeJeu.PERCEPTRON) {
-			this._viewCommand = new ViewCommand(this, this._bombGame);
-			this._viewBombGame = new ViewBombermanGame(this, this._bombGame);
-		}
+		this._viewCommand = new ViewCommand(this, this._bombGame);
+		this._viewBombGame = new ViewBombermanGame(this, this._bombGame);
 	}
 	
 	
@@ -110,24 +107,11 @@ public class ControllerBombermanGame implements InterfaceController {
 	}
 	
 	public Map getMap() {
-		//En mode PERCEPTRON, la map est 'mapPerceptron'
-		if(this._bombGame.getModeJeu() == ModeJeu.PERCEPTRON) {
-			try {
-				return new Map("layout/mapPerceptron");
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
 		return this._viewBombGame.getMap();
 	}
-	
 	public String getLayout() {
-		if(this._bombGame.getModeJeu() == ModeJeu.PERCEPTRON) {
-			return "mapPerceptron";
-		}
 		return this._viewCommand.getLayoutGame();
 	}
-	
 	public boolean[][] getListBreakableWall() {
 		return this._bombGame.getListBreakableWall();
 	}

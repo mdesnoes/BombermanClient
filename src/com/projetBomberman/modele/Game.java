@@ -11,7 +11,7 @@ public abstract class Game extends Observable implements Runnable {
 	private long _time;
 	private Thread _thread;
 
-	Game(int maxturn) {
+	public Game(int maxturn) {
 		this._maxturn = maxturn;
 		this._time = INIT_TIME;
 	}
@@ -59,30 +59,25 @@ public abstract class Game extends Observable implements Runnable {
 		this._thread = new Thread(this);
 		_thread.start();
 	}
-	
-	public void setTime(long time) {
-		this._time = time;
-	}
-
-	public int getTurn( ) {
-		return this._turn;
-	}
-	
-	public int getMaxTurn() {
-		return this._maxturn;
-	}
-
-	public long getTime() {
-		return this._time;
-	}
-	
-	public Thread getThread() {
-		return this._thread;
-	}
 
 	public abstract void initialize_game();
 	public abstract void takeTurn();
 	public abstract boolean gameContinue();
 	public abstract void gameOver();
+	
+	
+	
+	public void setTime(long time) {
+		this._time = time;
+	}
+	public int getTurn( ) {
+		return this._turn;
+	}
+	public int getMaxTurn() {
+		return this._maxturn;
+	}
+	public long getTime() {
+		return this._time;
+	}
 
 }
