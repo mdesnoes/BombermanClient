@@ -1,7 +1,7 @@
 package com.projetBomberman.view;
 
-import com.projetBomberman.modele.AgentAction;
-import com.projetBomberman.modele.ColorAgent;
+import com.projetBomberman.modele.info.AgentAction;
+import com.projetBomberman.modele.info.ColorAgent;
 
 public class InfoAgent {
 	
@@ -12,6 +12,9 @@ public class InfoAgent {
 	private char type;
 	private boolean isInvincible;
 	private boolean isSick;
+	
+	public InfoAgent() {
+	}
 	
 	public InfoAgent(int x, int y, AgentAction agentAction, char type, ColorAgent color, boolean isInvincible, boolean isSick) {
 		this.x=x;

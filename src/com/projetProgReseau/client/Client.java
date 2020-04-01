@@ -6,40 +6,52 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.Observable;
 
+import javax.swing.AbstractButton;
+import javax.swing.JFileChooser;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.projetBomberman.modele.BombermanGame;
-import com.projetBomberman.modele.ModeJeu;
-import com.projetBomberman.strategy.BreakWallStrategy;
-import com.projetBomberman.strategy.EsquiveStrategy;
-import com.projetBomberman.strategy.PutBombStrategy;
-import com.projetBomberman.strategy.RandomStrategy;
-import com.projetBomberman.strategy.Strategy;
+import com.projetBomberman.view.Map;
+import com.projetBomberman.view.ViewBombermanGame;
+import com.projetBomberman.view.ViewCommand;
 
 
 
-public class Client implements Runnable {
-	
-	/* A passée en paramètre du client lorsque le serveur sera adapté pour tous les modes de jeu */
-	private static final ModeJeu MODE_JEU = ModeJeu.SOLO;
-	
-	private static final String RANDOM_STRATEGY = "random";
-	private static final String PUT_BOMB_STRATEGY = "put_bomb";
-	private static final String BREAK_WALL_STRATEGY = "break_wall";
-	private static final String ESQUIVE_STRATEGY = "esquive";
-	
+public class Client extends Observable implements Runnable {
+
+	private static final String REP_LAYOUT = "./layout";
+	private static final String EXT_LAYOUT = ".lay";
 
 	private Socket connexion;
 	private PrintWriter sortie;
 	private DataInputStream entree;
 	private String nom;
 
-	private Strategy strategyAgent;
+	private String strategy;
 	private int maxturn;
 	private BombermanGame game;
+	private ViewCommand viewCommand;
+	private ViewBombermanGame viewBombermanGame;
+	
+	/* 
+	 * Pour empêcher un conflit de setter dans la classe AbstractButton
+	 * On ignore l'un des deux setter (qui ont le meme nom) qui pose problème pour Jackson
+	 */
+	public static interface MixIn {
+        @JsonIgnore
+        public void setMnemonic(char mnemonic);
+    }
+	
+	
 
 	public Client(String nomServ, int port, String strategyAgent, int maxturn) {
 		this.maxturn = maxturn;
-		this.strategyAgent = initStrategyAgent(strategyAgent);
+		this.strategy = strategyAgent;
+				//initStrategyAgent(strategyAgent);
 		
 		// Creation de la connexion et des entrees/sorties
 		try {
@@ -58,12 +70,10 @@ public class Client implements Runnable {
 			
             @Override
             public void run() {
-            	            	
-            	while(!connexion.isClosed()) {
-            		
-            	}
             	
-//            	fermeture();
+            	sortie.println(maxturn);
+            	sortie.println(strategy);
+            	
             }
         });
         envoyer.start();
@@ -71,20 +81,45 @@ public class Client implements Runnable {
 	
 	private void recevoir() {
 		Thread recevoir = new Thread(new Runnable() {
-            String msg = "";
             
             @Override
             public void run() {
             	try {
             		nom = entree.readUTF();
+            		System.out.println(nom);
             		
-            		/* Creation du jeu bomberman */
-        			game = new BombermanGame(Client.this, MODE_JEU, strategyAgent, maxturn);
+            		Map map = choixMapInitiale();
             		
+
+            		/* Le serveur initialise la map et nous renvoie l'etat du jeu au debut */
+            		ObjectMapper mapper = new ObjectMapper();
+        			try {
+        				mapper.addMixIn(AbstractButton.class, MixIn.class); /* Pour empêcher un conflit de setter dans la classe AbstractButton */
+        				game = mapper.readValue(entree.readUTF(), BombermanGame.class);
+        			} catch (Exception e) {
+        				System.out.println("ERREUR Etat du jeu non trouvé");
+        				e.printStackTrace();
+        				System.exit(-1);
+        			}
+            		System.out.println("Etat du jeu reçu avec succès");
+        			
+            		/* Creation des vues */
+        			viewCommand = new ViewCommand(Client.this);
+        			viewBombermanGame = new ViewBombermanGame(map);
+
+        			/* Tant que le client n'a pas quitter le jeu, on recupere l'etat courant du jeu etc */
 	            	while(!connexion.isClosed()) {
-						 msg = entree.readUTF();
 						
-						System.out.println(msg);
+	            		mapper = new ObjectMapper();
+	        			try {
+	        				mapper.addMixIn(AbstractButton.class, MixIn.class);
+	        				game = mapper.readValue(entree.readUTF(), BombermanGame.class);
+	        			} catch (Exception e) {
+	        				e.printStackTrace();
+	        				System.out.println("BombermanGame non trouvé");
+	        			}
+	        			viewBombermanGame.update(game);
+						
 	            	}
             	} catch(EOFException e) {
              	   System.out.println("Le serveur est fermé !");
@@ -100,29 +135,59 @@ public class Client implements Runnable {
 	}
 	
 	@Override
-	public void run() {		
+	public void run() {
 		envoyer();
 		recevoir();
 	}
 	
+	
+	public Map choixMapInitiale() {
+		/* Impl JFileChooser */
+		JFileChooser fc = new JFileChooser();
+		fc.setCurrentDirectory(new java.io.File( REP_LAYOUT ));
+		fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+		String layoutGame = "";
+		if(fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+			layoutGame = fc.getSelectedFile().getName();
+		}
+		
+		/* Creation de la map en fonction du layout choisi */
+		Map map = null;
+		if(layoutGame != null && layoutGame.endsWith( EXT_LAYOUT )) {
+			try {
+				map = new Map("layout/" + layoutGame);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		/* Envoie de la map au serveur via Jackson */
+		ObjectMapper mapper = new ObjectMapper();
+		String mapJson = "";
+		try {
+			mapJson = mapper.writeValueAsString(map);
+		} catch (JsonProcessingException e1) {
+			System.out.println("ERREUR lors de l'envoie de la map initiale");
+			e1.printStackTrace();
+			System.exit(-1);
+		}
+		sortie.println(mapJson);
+		System.out.println("Map envoyé avec succès");
+		
+		return map;
+	}
+	
+	
 	public void fermeture() {
 		try {
+			this.viewBombermanGame.setVisible(false);
+			this.viewCommand.setVisible(false);
 	    	entree.close();
 	    	sortie.close();
 	    	connexion.close();
 	    	System.exit(-1);
 		} catch(IOException e) {
 			e.printStackTrace();
-		}
-	}
-	
-	private Strategy initStrategyAgent(String strategyAgent) {
-		switch(strategyAgent) {
-			case RANDOM_STRATEGY: return new RandomStrategy();
-			case PUT_BOMB_STRATEGY: return new PutBombStrategy();
-			case BREAK_WALL_STRATEGY: return new BreakWallStrategy();
-			case ESQUIVE_STRATEGY: return new EsquiveStrategy();
-			default: return new RandomStrategy();
 		}
 	}
 
@@ -137,6 +202,12 @@ public class Client implements Runnable {
 	}
 	public void setSortie(PrintWriter sortie) {
 		this.sortie = sortie;
+	}
+	public BombermanGame getGame() {
+		return game;
+	}
+	public void setGame(BombermanGame game) {
+		this.game = game;
 	}
 
 

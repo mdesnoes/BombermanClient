@@ -1,36 +1,39 @@
 package com.projetBomberman.modele;
 
+import com.projetBomberman.modele.info.ItemType;
+
 public class Item {
 
-	private int _pos_x;
-	private int _pos_y;
-	private ItemType _type;
+	private int posX;
+	private int posY;
+	private ItemType type;
 
-	public Item(int x, int y, ItemType type) {
-		this._pos_x=x;
-		this._pos_y=y;
-		this._type=type;
+	public Item() {
 	}
 
 	
 	
-	public int getX() {
-		return _pos_x;
+	public int getPosX() {
+		return posX;
 	}
-	public void setX(int x) {
-		this._pos_x = x;
+	public void setPosX(int posX) {
+		this.posX = posX;
 	}
-	public int getY() {
-		return _pos_y;
+	public int getPosY() {
+		return posY;
 	}
-	public void setY(int y) {
-		this._pos_y = y;
+	public void setPosY(int posY) {
+		this.posY = posY;
 	}
 	public ItemType getType() {
-		return _type;
+		return type;
 	}
 	public void setType(ItemType type) {
-		this._type = type;
+		this.type = type;
 	}
+
+	
+	
+
 
 }

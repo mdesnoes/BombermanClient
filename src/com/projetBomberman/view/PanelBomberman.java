@@ -10,12 +10,13 @@ import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import java.util.ArrayList;
+import java.util.List;
+
 import javax.swing.JPanel;
 
-import com.projetBomberman.modele.AgentAction;
-import com.projetBomberman.modele.ItemType;
-import com.projetBomberman.modele.RadioTower;
-import com.projetBomberman.modele.StateBomb;
+import com.projetBomberman.modele.info.AgentAction;
+import com.projetBomberman.modele.info.ItemType;
+import com.projetBomberman.modele.info.StateBomb;
 
 /** 
  * Classe qui permet de charger d'afficher le panneau du jeu à partir d'une carte et de listes d'agents avec leurs positions.
@@ -34,10 +35,9 @@ public class PanelBomberman extends JPanel {
 	private float[] invincible = { 200, 200, 200, 1.0f };
 	private float[] skull = { 0.5f, 0.5f, 0.5f, 0.75f };
 	private Map map;
-	private ArrayList<InfoAgent> listInfoAgents;
-	private ArrayList<InfoItem> listInfoItems;
-	private ArrayList<InfoBomb> listInfoBombs;
-	private ArrayList<RadioTower> listRadioTower;
+	private List<InfoAgent> listInfoAgents;
+	private List<InfoItem> listInfoItems;
+	private List<InfoBomb> listInfoBombs;
 	private boolean[][] breakable_walls;
 	private int cpt;
 
@@ -47,7 +47,6 @@ public class PanelBomberman extends JPanel {
 		listInfoAgents = map.getStart_agents();	
 		listInfoItems = new ArrayList<>();
 		listInfoBombs = new ArrayList<>();
-		listRadioTower = map.getListRadioTower();
 	}
 
 	public void paint(Graphics g) {
@@ -60,7 +59,7 @@ public class PanelBomberman extends JPanel {
 		double position_x=0;
 		taille_x= map.getSizeX();
 		taille_y= map.getSizeY();
-		boolean[][] walls = map.get_walls();
+		boolean[][] walls = map.getWalls();
 		
 		for(int x=0; x<taille_x; x++) {
 			double position_y = 0 ;
@@ -95,25 +94,6 @@ public class PanelBomberman extends JPanel {
 			position_x+=stepx;
 		}
 
-		position_x=0;
-		for(int x=0; x<taille_x; x++) {
-			double position_y = 0 ;
-
-			for(int y=0; y<taille_y; y++) {
-				
-				if(this.getRadioTower(x,y) != null) {
-					try {
-						Image img = ImageIO.read(new File("./image/RadioTower.png"));
-						g.drawImage(img, (int)position_x, (int)position_y, (int)stepx, (int)stepy, this);
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-				position_y+=stepy;				
-			}
-			position_x+=stepx;
-		}
-
 		for (InfoItem listInfoItem : listInfoItems) {
 			dessine_Items(g, listInfoItem);
 		}
@@ -127,15 +107,6 @@ public class PanelBomberman extends JPanel {
 		}
 
 		cpt++;
-	}
-	
-	public RadioTower getRadioTower(int x, int y) {
-		for(RadioTower rd : this.listRadioTower) {
-			if(rd.getX() == x && rd.getY() == y) {
-				return rd;
-			}
-		}
-		return null;
 	}
 
 
@@ -404,7 +375,7 @@ public class PanelBomberman extends JPanel {
 		}
 	}
 
-	void setInfoGame(boolean[][] breakable_walls, ArrayList<InfoAgent> listInfoAgents, ArrayList<InfoItem> listInfoItems, ArrayList<InfoBomb> listInfoBombs) {
+	void setInfoGame(boolean[][] breakable_walls, List<InfoAgent> listInfoAgents, List<InfoItem> listInfoItems, List<InfoBomb> listInfoBombs) {
 		this.listInfoAgents = listInfoAgents;
 		this.listInfoItems = listInfoItems;
 		this.listInfoBombs = listInfoBombs;

@@ -8,9 +8,8 @@ import java.io.Serializable;
 
 import java.util.ArrayList;
 
-import com.projetBomberman.modele.AgentAction;
-import com.projetBomberman.modele.ColorAgent;
-import com.projetBomberman.modele.RadioTower;
+import com.projetBomberman.modele.info.AgentAction;
+import com.projetBomberman.modele.info.ColorAgent;
 
 /** 
  * Classe qui permet de charger une carte de Bomberman à partir d'un fichier de layout d'extension .lay
@@ -23,13 +22,16 @@ public class Map implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private String filename;
-	private int size_x;
-	private int size_y;
+	private int sizeX;
+	private int sizeY;
 	private boolean[][] walls;
 	private boolean[][] start_breakable_walls;
 	private ArrayList<InfoAgent> start_agents;
-	private ArrayList<RadioTower> listRadioTower = new ArrayList<RadioTower>();
 
+	
+	public Map() {
+	}
+	
 	public Map(String filename) throws Exception {
 		
 		this.filename = filename;
@@ -56,10 +58,10 @@ public class Map implements Serializable {
 			}
 
 			tampon.close();
-			size_x = nbX;
-			size_y = nbY;
-			walls = new boolean [size_x][size_y];
-			start_breakable_walls  = new boolean [size_x][size_y];
+			sizeX = nbX;
+			sizeY = nbY;
+			walls = new boolean [sizeX][sizeY];
+			start_breakable_walls  = new boolean [sizeX][sizeY];
 			flux = new FileInputStream(filename);
 			lecture = new InputStreamReader(flux);
 			tampon = new BufferedReader(lecture);
@@ -86,10 +88,6 @@ public class Map implements Serializable {
 						start_agents.add(new InfoAgent(x,y,AgentAction.STOP, ligne.charAt(x),col,false,false));
 						cpt_col++;
 					}
-					
-					if(ligne.charAt(x) == 'T') {
-						listRadioTower.add(new RadioTower(x,y));
-					}
 				}
 
 				y++;
@@ -98,26 +96,26 @@ public class Map implements Serializable {
 			tampon.close();
 
 			//On verifie que le labyrinthe est clos
-			for(int x=0;x<size_x;x++) {
+			for(int x=0;x<sizeX;x++) {
 				if (!walls[x][0]) {
 					throw new Exception("Mauvais format du fichier: la carte doit etre close");
 				}
 			}
 
-			for(int x=0;x<size_x;x++) {
-				if (!walls[x][size_y-1]) {
+			for(int x=0;x<sizeX;x++) {
+				if (!walls[x][sizeY-1]) {
 					throw new Exception("Mauvais format du fichier: la carte doit etre close");
 				}
 			}
 
-			for(y=0;y<size_y;y++) {
+			for(y=0;y<sizeY;y++) {
 				if (!walls[0][y]) {
 					throw new Exception("Mauvais format du fichier: la carte doit etre close");
 				}
 			}
 
-			for(y=0;y<size_y;y++) {
-				if (!walls[size_x-1][y]) {
+			for(y=0;y<sizeY;y++) {
+				if (!walls[sizeX-1][y]) {
 					throw new Exception("Mauvais format du fichier: la carte doit etre close");
 				}
 			}
@@ -127,27 +125,44 @@ public class Map implements Serializable {
 		}
 	}
 
-	public int getSizeX() {return(size_x);}
-
-	public int getSizeY() {return(size_y);}
-
-	public String getFilename(){
+	
+	
+	public String getFilename() {
 		return filename;
 	}
-
+	public void setFilename(String filename) {
+		this.filename = filename;
+	}
+	public int getSizeX() {
+		return sizeX;
+	}
+	public void setSizeX(int sizeX) {
+		this.sizeX = sizeX;
+	}
+	public int getSizeY() {
+		return sizeY;
+	}
+	public void setSizeY(int sizeY) {
+		this.sizeY = sizeY;
+	}
+	public boolean[][] getWalls() {
+		return walls;
+	}
+	public void setWalls(boolean[][] walls) {
+		this.walls = walls;
+	}
 	public boolean[][] getStart_breakable_walls() {
 		return start_breakable_walls;
 	}
-
-	public boolean[][] get_walls() {
-		return walls;
+	public void setStart_breakable_walls(boolean[][] start_breakable_walls) {
+		this.start_breakable_walls = start_breakable_walls;
 	}
-
 	public ArrayList<InfoAgent> getStart_agents() {
 		return start_agents;
 	}
-	
-	public ArrayList<RadioTower> getListRadioTower() {
-		return this.listRadioTower;
+	public void setStart_agents(ArrayList<InfoAgent> start_agents) {
+		this.start_agents = start_agents;
 	}
+
+	
 }

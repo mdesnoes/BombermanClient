@@ -1,4 +1,4 @@
-package com.projetBomberman.modele;
+package com.projetBomberman.modele.info;
 
 public enum ModeJeu {
 	
