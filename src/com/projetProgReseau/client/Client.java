@@ -23,7 +23,6 @@ import com.projetBomberman.view.ViewCommand;
 
 public class Client extends Observable implements Runnable {
 
-	private static final String REP_LAYOUT = "./layout";
 	private static final String EXT_LAYOUT = ".lay";
 
 	private Socket connexion;
@@ -144,18 +143,21 @@ public class Client extends Observable implements Runnable {
 	public Map choixMapInitiale() {
 		/* Impl JFileChooser */
 		JFileChooser fc = new JFileChooser();
-		fc.setCurrentDirectory(new java.io.File( REP_LAYOUT ));
+		
+		String cheminLayout = "";
 		fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 		String layoutGame = "";
 		if(fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
 			layoutGame = fc.getSelectedFile().getName();
+			cheminLayout = fc.getSelectedFile().getAbsolutePath();
 		}
+		System.out.println(cheminLayout);
 		
 		/* Creation de la map en fonction du layout choisi */
 		Map map = null;
 		if(layoutGame != null && layoutGame.endsWith( EXT_LAYOUT )) {
 			try {
-				map = new Map("layout/" + layoutGame);
+				map = new Map( cheminLayout );
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

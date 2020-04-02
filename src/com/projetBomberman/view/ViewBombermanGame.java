@@ -43,19 +43,6 @@ public class ViewBombermanGame extends JFrame {
 		this.setVisible(true);
 	}
 	
-//	public Map getMap() {
-//		return this._map;
-//	}
-//	public void setMap(Map map) {
-//		this._map = map;
-//	}
-	
-//	public void update(Observable obs, Object arg) {
-//		this._panel.setInfoGame(this._controllerGame.getListBreakableWall(), this._controllerGame.getListInfoAgent(),
-//			this._controllerGame.getListInfoItems(), this._controllerGame.getListInfoBombs());
-//		this._panel.repaint();
-//	}
-	
 	public void update(BombermanGame game) {
 		
 		List<InfoAgent> listeInfoAgent = getListInfoAgent(game.getListAgentsBomberman(), game.getListAgentsPNJ());

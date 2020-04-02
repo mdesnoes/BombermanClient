@@ -8,8 +8,6 @@ import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
 import java.awt.Point;
-import java.io.File;
-import java.io.FilenameFilter;
 import java.io.PrintWriter;
 
 import javax.swing.Icon;
@@ -25,10 +23,14 @@ public class ViewCommand extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	
+	private static final String ICONE_RESTART = "/icon_restart.png";
+	private static final String ICONE_RUN = "/icon_run.png";
+	private static final String ICONE_STEP = "/icon_step.png";
+	private static final String ICONE_PAUSE = "/icon_pause.png";
+
+	
 	private static final int SPEED_MIN = 1;		// Vitesse minimum des tours
 	private static final int SPEED_MAX = 10;		// Vitesse maximum des tours
-	private static final String EXT_LAYOUT = ".lay";
-	private static final String REP_ICONES = "./icones";
 	private static final int INIT_TIME = 1000;
 
 	
@@ -57,13 +59,13 @@ public class ViewCommand extends JFrame {
 		panelPrincipal.setLayout(new GridLayout(2,1));
 		JPanel panelButton = new JPanel();		
 		panelButton.setLayout(new GridLayout(1,4));
-		Icon icon_restart = new ImageIcon(REP_ICONES + "/icon_restart.png");
+		Icon icon_restart = new ImageIcon( getClass().getResource( ICONE_RESTART ));
 		JButton buttonRestart = new JButton(icon_restart);
-		Icon icon_run = new ImageIcon(REP_ICONES + "/icon_run.png");
+		Icon icon_run = new ImageIcon( getClass().getResource( ICONE_RUN ));
 		JButton buttonRun = new JButton(icon_run);
-		Icon icon_step = new ImageIcon(REP_ICONES + "/icon_step.png");
+		Icon icon_step = new ImageIcon( getClass().getResource( ICONE_STEP ));
 		JButton buttonStep = new JButton(icon_step);
-		Icon icon_stop = new ImageIcon(REP_ICONES + "/icon_pause.png");
+		Icon icon_stop = new ImageIcon( getClass().getResource( ICONE_PAUSE ));
 		JButton buttonStop = new JButton(icon_stop);
 		
 		//Permet d'appeler le controleur afin d'initialiser le jeu
@@ -156,27 +158,6 @@ public class ViewCommand extends JFrame {
 		this.setVisible(true);
 	}
 
-	public String[] getLayouts() {
-		File repertoire = new File(System.getProperty("user.dir") + "/layout");
-		
-		FilenameFilter layoutFilter = (dir, name) -> name.endsWith( EXT_LAYOUT );
-		
-		File[] files = repertoire.listFiles(layoutFilter);
-		assert files != null;
-		String[] layouts = new String[files.length];
-
-		for(int i=0; i<files.length; ++i) {
-			layouts[i] = files[i].getName();
-		}
-		
-		return layouts;
-	}
-
-
-//	public void update(Observable obs, Object arg) {
-//		Game game = (Game)obs;
-//		this._labelTurn.setText("Turn : " + game.getTurn());
-//	}
 	
 	public void update(BombermanGame game) {
 		this.labelTurn.setText("Turn : " + game.getTurn());
