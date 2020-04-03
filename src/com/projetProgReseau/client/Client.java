@@ -18,23 +18,31 @@ import com.projetBomberman.modele.BombermanGame;
 import com.projetBomberman.view.Map;
 import com.projetBomberman.view.ViewBombermanGame;
 import com.projetBomberman.view.ViewCommand;
+import com.projetBomberman.view.ViewGagnant;
+import com.projetBomberman.view.ViewModeInteractif;
 
 
 
 public class Client extends Observable implements Runnable {
 
 	private static final String EXT_LAYOUT = ".lay";
+	private static final String MSG_FIN_PARTIE = "FIN_PARTIE";
+	private static final String SEP_MSG_FIN_PARTIE = ">";
+	private static final String SEP_DONNEES_FIN_PARTIE = ";";
 
 	private Socket connexion;
 	private PrintWriter sortie;
 	private DataInputStream entree;
 	private String nom;
 
+	private String modeJeu;
 	private String strategy;
 	private int maxturn;
 	private BombermanGame game;
 	private ViewCommand viewCommand;
 	private ViewBombermanGame viewBombermanGame;
+	private ViewModeInteractif viewModeInteractif;
+	
 	
 	/* 
 	 * Pour empêcher un conflit de setter dans la classe AbstractButton
@@ -47,10 +55,10 @@ public class Client extends Observable implements Runnable {
 	
 	
 
-	public Client(String nomServ, int port, String strategyAgent, int maxturn) {
+	public Client(String nomServ, int port, String modeJeu, String strategyAgent, int maxturn) {
+		this.modeJeu = modeJeu;
 		this.maxturn = maxturn;
 		this.strategy = strategyAgent;
-				//initStrategyAgent(strategyAgent);
 		
 		// Creation de la connexion et des entrees/sorties
 		try {
@@ -62,82 +70,100 @@ public class Client extends Observable implements Runnable {
 	    	System.exit(-1);
 		}
 	}
-
-
-	private void envoyer() {
-		Thread envoyer = new Thread(new Runnable() {
-			
-            @Override
-            public void run() {
-            	
-            	sortie.println(maxturn);
-            	sortie.println(strategy);
-            	
-            }
-        });
-        envoyer.start();
-	}
 	
-	private void recevoir() {
-		Thread recevoir = new Thread(new Runnable() {
+	
+	@Override
+	public void run() {
+		Thread t = new Thread(new Runnable() {
+            String msg;
             
             @Override
             public void run() {
             	try {
-            		nom = entree.readUTF();
-            		System.out.println(nom);
+            		/* Envoie au serveur des options pour créer le jeu */
+            		envoyerConfigurationJeu();
             		
+            		/*  Nom du client */
+            		nom = entree.readUTF();
+            		
+            		/* JFileChooser pour le choix de la map */
             		Map map = choixMapInitiale();
             		
-
             		/* Le serveur initialise la map et nous renvoie l'etat du jeu au debut */
-            		ObjectMapper mapper = new ObjectMapper();
-        			try {
-        				mapper.addMixIn(AbstractButton.class, MixIn.class); /* Pour empêcher un conflit de setter dans la classe AbstractButton */
-        				game = mapper.readValue(entree.readUTF(), BombermanGame.class);
-        			} catch (Exception e) {
-        				System.out.println("ERREUR Etat du jeu non trouvé");
-        				e.printStackTrace();
-        				System.exit(-1);
-        			}
-            		System.out.println("Etat du jeu reçu avec succès");
+            		receptionEtatJeu(entree.readUTF());
         			
-            		/* Creation des vues */
+            		/* Création des vues */
         			viewCommand = new ViewCommand(Client.this);
         			viewBombermanGame = new ViewBombermanGame(map);
+        			if(modeJeu.equals("solo") || modeJeu.equals("duo")) {
+        				viewModeInteractif = ViewModeInteractif.getInstance();
+        			}
 
         			/* Tant que le client n'a pas quitter le jeu, on recupere l'etat courant du jeu etc */
 	            	while(!connexion.isClosed()) {
+	            		
+	            		msg = entree.readUTF();
 						
-	            		mapper = new ObjectMapper();
-	        			try {
-	        				mapper.addMixIn(AbstractButton.class, MixIn.class);
-	        				game = mapper.readValue(entree.readUTF(), BombermanGame.class);
-	        			} catch (Exception e) {
-	        				e.printStackTrace();
-	        				System.out.println("BombermanGame non trouvé");
-	        			}
-	        			viewBombermanGame.update(game);
+	            		if(msg.contains( MSG_FIN_PARTIE )) {
+	            			finDePartie(msg);
+	            		}
+	            		else {
+	            			receptionEtatJeu(msg);
+		      
+		        			/* Mise à jour du plateau du jeu */
+		        			viewBombermanGame.update(game);
+		        			/* Mise à jour du plateau de commande */
+		        			viewCommand.update(game);
+	            		}
 						
 	            	}
+	            	
+	            	
             	} catch(EOFException e) {
-             	   System.out.println("Le serveur est fermé !");
-             	   fermeture();
+             	    System.out.println("Le serveur est fermé !");
+             	   	fermeture();
             	} catch(SocketException e) {
             		System.out.println("Connexion fermée !");
+            		fermeture();
                 } catch (IOException e) {
 					e.printStackTrace();
 				}
             }
         });
-        recevoir.start();
+        t.start();
 	}
 	
-	@Override
-	public void run() {
-		envoyer();
-		recevoir();
+	
+	private void envoyerConfigurationJeu() {
+    	this.sortie.println(modeJeu);
+    	this.sortie.println(maxturn);
+    	this.sortie.println(strategy);
 	}
+	
+	
+	private void receptionEtatJeu(String etat) {
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			mapper.addMixIn(AbstractButton.class, MixIn.class); /* Pour empêcher un conflit de setter dans la classe AbstractButton */
+			game = mapper.readValue(etat, BombermanGame.class);
+		} catch (Exception e) {
+			System.out.println("ERREUR Etat du jeu non trouvé");
+			e.printStackTrace();
+			System.exit(-1);
+		}
+		System.out.println("[SERVEUR] Etat du jeu reçu avec succès pour le client " + this.nom );
+	}
+	
+	private void finDePartie(String msg) {
+		
+		String donnees = msg.split( SEP_MSG_FIN_PARTIE )[1];
+		String[] tabDonnees = donnees.split( SEP_DONNEES_FIN_PARTIE );
+		String vainqueur = tabDonnees[0];
+		String couleur = tabDonnees[1];
+		
+		ViewGagnant.getInstance(this, vainqueur, couleur);
+	}
+
 	
 	
 	public Map choixMapInitiale() {
@@ -174,16 +200,21 @@ public class Client extends Observable implements Runnable {
 			System.exit(-1);
 		}
 		sortie.println(mapJson);
-		System.out.println("Map envoyé avec succès");
+		System.out.println("[SERVEUR] Map envoyé à " + this.nom + " avec succès");
 		
 		return map;
 	}
+	
+	
 	
 	
 	public void fermeture() {
 		try {
 			this.viewBombermanGame.setVisible(false);
 			this.viewCommand.setVisible(false);
+			if(this.viewModeInteractif != null) {
+				this.viewModeInteractif.setVisible(false);
+			}
 	    	entree.close();
 	    	sortie.close();
 	    	connexion.close();
@@ -215,19 +246,20 @@ public class Client extends Observable implements Runnable {
 
 	public static void main(String[] argu) {
 
-		if (argu.length == 4) {
+		if (argu.length == 5) {
 			
 			String s = argu[0];
 			int p = Integer.parseInt(argu[1]);
-			String strategy = argu[2];
-			int maxturn = Integer.parseInt(argu[3]);
+			String modeJeu = argu[2];
+			String strategy = argu[3];
+			int maxturn = Integer.parseInt(argu[4]);
 			
-			Client c1 = new Client(s, p, strategy, maxturn);
+			Client c1 = new Client(s, p, modeJeu, strategy, maxturn);
 			Thread t = new Thread(c1);
 			t.start();
 			
 		} else {
-			System.out.println("syntaxe d’appel : java client serveur port strategie_des_agents nombre_max_de_tour\n");
+			System.out.println("syntaxe d’appel : java client serveur port mode_de_jeu=>(normal|solo|duo) strategie_des_agents=>(random|put_bomb|break_wall|esquive) nombre_max_de_tour\n");
 		} 
 		
 	}

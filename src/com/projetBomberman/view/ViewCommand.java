@@ -28,14 +28,20 @@ public class ViewCommand extends JFrame {
 	private static final String ICONE_STEP = "/icon_step.png";
 	private static final String ICONE_PAUSE = "/icon_pause.png";
 
+	private static final String MSG_DECO_CLIENT = "DECONNEXION";
+	private static final String MSG_INIT_GAME = "INITIALISATION";
+	private static final String MSG_PAUSE_GAME = "PAUSE";
+	private static final String MSG_ETAPE_GAME = "ETAPE";
+	private static final String MSG_DEBUT_GAME = "DEBUT";
 	
-	private static final int SPEED_MIN = 1;		// Vitesse minimum des tours
-	private static final int SPEED_MAX = 10;		// Vitesse maximum des tours
+	private static final int SPEED_MIN = 1;	
+	private static final int SPEED_MAX = 10;
 	private static final int INIT_TIME = 1000;
+	private static final int VAL_SLIDER_INIT = 5;
 
 	
-	private JLabel labelTurn;					// Le label qui affiche le tour courant
-	private JSlider slider;					// Le slider qui affiche la vitesse des tours en seconde
+	private JLabel labelTurn;
+	private JSlider slider;
 	private Client client;
 	private PrintWriter sortie;
 	
@@ -68,36 +74,32 @@ public class ViewCommand extends JFrame {
 		Icon icon_stop = new ImageIcon( getClass().getResource( ICONE_PAUSE ));
 		JButton buttonStop = new JButton(icon_stop);
 		
-		//Permet d'appeler le controleur afin d'initialiser le jeu
 		buttonRestart.addActionListener(evenement -> {
-			this.sortie.println("[CLIENT : " + this.client.getNom() + "] INITIALISATION DE LA PARTIE");
+			this.sortie.println( MSG_INIT_GAME );
 			buttonRestart.setEnabled(false);
 			buttonRun.setEnabled(true);
 			buttonStep.setEnabled(true);
 			buttonStop.setEnabled(true);
 		});
 		
-		//Permet d'appeler le controleur afin de demarrer le jeu
 		buttonRun.addActionListener(evenement -> {
-			this.sortie.println("[CLIENT : " + this.client.getNom() + "] DEBUT DE LA PARTIE");
+			this.sortie.println( MSG_DEBUT_GAME );
 			buttonRestart.setEnabled(false);
 			buttonRun.setEnabled(false);
 			buttonStep.setEnabled(false);
 			buttonStop.setEnabled(true);
 		});
 		
-		//Permet d'appeler le controleur afin de passer au tour suivant
 		buttonStep.addActionListener(evenement -> {
-			this.sortie.println("[CLIENT : " + this.client.getNom() + "] AVANCEMENT D'UNE ETAPE DE LA PARTIE");
+			this.sortie.println( MSG_ETAPE_GAME );
 			buttonRestart.setEnabled(true);
 			buttonRun.setEnabled(true);
 			buttonStep.setEnabled(true);
 			buttonStop.setEnabled(false);
 		});
 		
-		//Permet d'appeler le controleur afin de faire une pause
 		buttonStop.addActionListener(evenement -> {
-			this.sortie.println("[CLIENT : " + this.client.getNom() + "] PARTIE EN PAUSE");
+			this.sortie.println( MSG_PAUSE_GAME );
 			buttonRestart.setEnabled(true);
 			buttonRun.setEnabled(true);
 			buttonStep.setEnabled(true);
@@ -124,11 +126,10 @@ public class ViewCommand extends JFrame {
 		this.slider.setPaintLabels(true);
 		this.slider.setMinorTickSpacing(SPEED_MIN);
 		this.slider.setMajorTickSpacing(SPEED_MIN);
-		this.slider.setValue((int)this.client.getGame().getTime()/1000);
+		this.slider.setValue( VAL_SLIDER_INIT );
 
-		//Permet d'appeler le constructeur afin de modifier le temps des tours
 		this.slider.addChangeListener(arg0 -> 
-			this.client.getGame().setTime(INIT_TIME / slider.getValue())
+			this.sortie.println( INIT_TIME / slider.getValue() )
 		);
 		
 		panelSlider.add(this.slider);
@@ -142,7 +143,7 @@ public class ViewCommand extends JFrame {
 		
 		JButton buttonClose = new JButton("Quitter le jeu");
 		buttonClose.addActionListener(evenement -> {
-			this.sortie.println("[CLIENT : " + this.client.getNom() + "] DECONNEXION");
+			this.sortie.println( MSG_DECO_CLIENT );
 			this.client.fermeture();
 		});
 		
