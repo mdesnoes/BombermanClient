@@ -6,6 +6,11 @@ import com.projetBomberman.modele.AgentPNJ;
 import com.projetBomberman.modele.Bombe;
 import com.projetBomberman.modele.BombermanGame;
 import com.projetBomberman.modele.Item;
+import com.projetBomberman.modele.Map;
+import com.projetBomberman.modele.PanelBomberman;
+import com.projetBomberman.modele.info.InfoAgent;
+import com.projetBomberman.modele.info.InfoBomb;
+import com.projetBomberman.modele.info.InfoItem;
 
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;

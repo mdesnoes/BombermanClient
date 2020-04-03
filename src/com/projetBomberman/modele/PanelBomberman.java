@@ -1,4 +1,4 @@
-package com.projetBomberman.view;
+package com.projetBomberman.modele;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -15,6 +15,9 @@ import java.util.List;
 import javax.swing.JPanel;
 
 import com.projetBomberman.modele.info.AgentAction;
+import com.projetBomberman.modele.info.InfoAgent;
+import com.projetBomberman.modele.info.InfoBomb;
+import com.projetBomberman.modele.info.InfoItem;
 import com.projetBomberman.modele.info.ItemType;
 import com.projetBomberman.modele.info.StateBomb;
 
@@ -65,7 +68,7 @@ public class PanelBomberman extends JPanel {
 	private boolean[][] breakable_walls;
 	private int cpt;
 
-	PanelBomberman(Map map) {
+	public PanelBomberman(Map map) {
 		this.map = map;
 		this.breakable_walls = map.getStart_breakable_walls();
 		listInfoAgents = map.getStart_agents();	
@@ -399,7 +402,7 @@ public class PanelBomberman extends JPanel {
 		}
 	}
 
-	void setInfoGame(boolean[][] breakable_walls, List<InfoAgent> listInfoAgents, List<InfoItem> listInfoItems, List<InfoBomb> listInfoBombs) {
+	public void setInfoGame(boolean[][] breakable_walls, List<InfoAgent> listInfoAgents, List<InfoItem> listInfoItems, List<InfoBomb> listInfoBombs) {
 		this.listInfoAgents = listInfoAgents;
 		this.listInfoItems = listInfoItems;
 		this.listInfoBombs = listInfoBombs;

@@ -1,6 +1,4 @@
-package com.projetBomberman.view;
-
-import com.projetBomberman.modele.info.ItemType;
+package com.projetBomberman.modele.info;
 
 public class InfoItem {
 	
@@ -17,23 +15,18 @@ public class InfoItem {
 	public int getX() {
 		return x;
 	}
-
 	public void setX(int x) {
 		this.x = x;
 	}
-
 	public int getY() {
 		return y;
 	}
-
 	public void setY(int y) {
 		this.y = y;
 	}
-
 	public ItemType getType() {
 		return type;
 	}
-
 	public void setType(ItemType type) {
 		this.type = type;
 	}

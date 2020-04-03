@@ -1,4 +1,4 @@
-package com.projetBomberman.view;
+package com.projetBomberman.modele;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import com.projetBomberman.modele.info.AgentAction;
 import com.projetBomberman.modele.info.ColorAgent;
+import com.projetBomberman.modele.info.InfoAgent;
 
 /** 
  * Classe qui permet de charger une carte de Bomberman à partir d'un fichier de layout d'extension .lay

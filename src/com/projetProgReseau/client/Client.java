@@ -5,7 +5,6 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.net.SocketException;
 import java.util.Observable;
 
 import javax.swing.AbstractButton;
@@ -15,9 +14,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.projetBomberman.modele.BombermanGame;
-import com.projetBomberman.view.Map;
+import com.projetBomberman.modele.Map;
 import com.projetBomberman.view.ViewBombermanGame;
 import com.projetBomberman.view.ViewCommand;
+import com.projetBomberman.view.ViewConnexion;
 import com.projetBomberman.view.ViewGagnant;
 import com.projetBomberman.view.ViewModeInteractif;
 
@@ -29,6 +29,8 @@ public class Client extends Observable implements Runnable {
 	private static final String MSG_FIN_PARTIE = "FIN_PARTIE";
 	private static final String SEP_MSG_FIN_PARTIE = ">";
 	private static final String SEP_DONNEES_FIN_PARTIE = ";";
+	
+	private static final String CONNEXION_OK = "Connexion acceptee";
 
 	private Socket connexion;
 	private PrintWriter sortie;
@@ -60,14 +62,14 @@ public class Client extends Observable implements Runnable {
 		this.maxturn = maxturn;
 		this.strategy = strategyAgent;
 		
-		// Creation de la connexion et des entrees/sorties
+		/* Creation du socket de connexion et des entrees/sorties */
 		try {
 			this.connexion = new Socket(nomServ, port);
 			this.sortie = new PrintWriter(this.connexion.getOutputStream(), true);
 			this.entree = new DataInputStream(this.connexion.getInputStream());
 		} catch (IOException e) {
-			System.out.println("Aucun serveur n’est rattaché au port");
-	    	System.exit(-1);
+			System.out.println("[CLIENT] [ERREUR] Aucun serveur n’est rattaché au port");
+	    	fermeture();
 		}
 	}
 	
@@ -80,11 +82,20 @@ public class Client extends Observable implements Runnable {
             @Override
             public void run() {
             	try {
+            		
+            		/* Connexion au serveur */
+            		ViewConnexion viewConnexion = new ViewConnexion(Client.this);
+            		msg = entree.readUTF();
+            		while(!msg.equals( CONNEXION_OK )) {
+            			viewConnexion.afficherLabelMessageErreur();
+            			msg = entree.readUTF();
+            		}
+            		viewConnexion.setVisible(false);
+            		System.out.println("[CLIENT] Bienvenue sur le serveur " + nom);
+            		
+            		
             		/* Envoie au serveur des options pour créer le jeu */
             		envoyerConfigurationJeu();
-            		
-            		/*  Nom du client */
-            		nom = entree.readUTF();
             		
             		/* JFileChooser pour le choix de la map */
             		Map map = choixMapInitiale();
@@ -120,11 +131,8 @@ public class Client extends Observable implements Runnable {
 	            	
 	            	
             	} catch(EOFException e) {
-             	    System.out.println("Le serveur est fermé !");
+             	    System.out.println("[CLIENT] [ERREUR] Le serveur est fermé ou vous avez quitter le serveur !");
              	   	fermeture();
-            	} catch(SocketException e) {
-            		System.out.println("Connexion fermée !");
-            		fermeture();
                 } catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -147,11 +155,10 @@ public class Client extends Observable implements Runnable {
 			mapper.addMixIn(AbstractButton.class, MixIn.class); /* Pour empêcher un conflit de setter dans la classe AbstractButton */
 			game = mapper.readValue(etat, BombermanGame.class);
 		} catch (Exception e) {
-			System.out.println("ERREUR Etat du jeu non trouvé");
+			System.out.println("[CLIENT] [ERREUR] Etat du jeu non reçu");
 			e.printStackTrace();
-			System.exit(-1);
+			fermeture();
 		}
-		System.out.println("[SERVEUR] Etat du jeu reçu avec succès pour le client " + this.nom );
 	}
 	
 	private void finDePartie(String msg) {
@@ -177,7 +184,6 @@ public class Client extends Observable implements Runnable {
 			layoutGame = fc.getSelectedFile().getName();
 			cheminLayout = fc.getSelectedFile().getAbsolutePath();
 		}
-		System.out.println(cheminLayout);
 		
 		/* Creation de la map en fonction du layout choisi */
 		Map map = null;
@@ -185,7 +191,9 @@ public class Client extends Observable implements Runnable {
 			try {
 				map = new Map( cheminLayout );
 			} catch (Exception e) {
+				System.out.println("[CLIENT] [ERREUR] erreur lors de la creation de la map");
 				e.printStackTrace();
+				fermeture();
 			}
 		}
 		
@@ -195,17 +203,14 @@ public class Client extends Observable implements Runnable {
 		try {
 			mapJson = mapper.writeValueAsString(map);
 		} catch (JsonProcessingException e1) {
-			System.out.println("ERREUR lors de l'envoie de la map initiale");
+			System.out.println("[CLIENT] [ERREUR] erreur lors de l'envoie de la map initiale");
 			e1.printStackTrace();
-			System.exit(-1);
+			fermeture();
 		}
-		sortie.println(mapJson);
-		System.out.println("[SERVEUR] Map envoyé à " + this.nom + " avec succès");
+		this.sortie.println(mapJson);
 		
 		return map;
 	}
-	
-	
 	
 	
 	public void fermeture() {
@@ -224,6 +229,8 @@ public class Client extends Observable implements Runnable {
 		}
 	}
 
+	
+	
 	public String getNom() {
 		return nom;
 	}

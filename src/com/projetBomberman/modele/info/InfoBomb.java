@@ -1,6 +1,4 @@
-package com.projetBomberman.view;
-
-import com.projetBomberman.modele.info.StateBomb;
+package com.projetBomberman.modele.info;
 
 public class InfoBomb {
 	
@@ -16,34 +14,29 @@ public class InfoBomb {
 		this.stateBomb = stateBomb;
 	}
 	
+	
+	
 	public int getX() {
 		return x;
 	}
-
 	public void setX(int x) {
 		this.x = x;
 	}
-
 	public int getY() {
 		return y;
 	}
-
 	public void setY(int y) {
 		this.y = y;
 	}
-
-	StateBomb getStateBomb() {
+	public StateBomb getStateBomb() {
 		return stateBomb;
 	}
-
 	public void setStateBomb(StateBomb stateBomb) {
 		this.stateBomb = stateBomb;
 	}
-
-	int getRange() {
+	public int getRange() {
 		return range;
 	}
-
 	public void setRange(int range) {
 		this.range = range;
 	}

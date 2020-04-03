@@ -1,7 +1,4 @@
-package com.projetBomberman.view;
-
-import com.projetBomberman.modele.info.AgentAction;
-import com.projetBomberman.modele.info.ColorAgent;
+package com.projetBomberman.modele.info;
 
 public class InfoAgent {
 	
@@ -26,58 +23,46 @@ public class InfoAgent {
 		this.isSick = isSick;
 	}
 	
+	
 	public int getX() {
 		return x;
 	}
-
 	public void setX(int x) {
 		this.x = x;
 	}
-
 	public int getY() {
 		return y;
 	}
-
 	public void setY(int y) {
 		this.y = y;
 	}
-	
-	ColorAgent getColor() {
+	public ColorAgent getColor() {
 		return color;
 	}
-
 	public void setColor(ColorAgent color) {
 		this.color = color;
 	}
-	
 	public char getType() {
 		return type;
 	}
-
 	public void setType(char type) {
 		this.type = type;
 	}
-
-	boolean isInvincible() {
+	public boolean isInvincible() {
 		return isInvincible;
 	}
-
 	public void setInvincible(boolean isInvincible) {
 		this.isInvincible = isInvincible;
 	}
-
-	boolean isSick() {
+	public boolean isSick() {
 		return isSick;
 	}
-
 	public void setSick(boolean isSick) {
 		this.isSick = isSick;
 	}
-
-	AgentAction getAgentAction() {
+	public AgentAction getAgentAction() {
 		return agentAction;
 	}
-
 	public void setAgentAction(AgentAction agentAction) {
 		this.agentAction = agentAction;
 	}
