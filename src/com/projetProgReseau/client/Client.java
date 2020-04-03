@@ -69,7 +69,7 @@ public class Client extends Observable implements Runnable {
 			this.entree = new DataInputStream(this.connexion.getInputStream());
 		} catch (IOException e) {
 			System.out.println("[CLIENT] [ERREUR] Aucun serveur n’est rattaché au port");
-	    	fermeture();
+	    	System.exit(-1);
 		}
 	}
 	
@@ -162,12 +162,11 @@ public class Client extends Observable implements Runnable {
 	}
 	
 	private void finDePartie(String msg) {
-		
 		String donnees = msg.split( SEP_MSG_FIN_PARTIE )[1];
 		String[] tabDonnees = donnees.split( SEP_DONNEES_FIN_PARTIE );
 		String vainqueur = tabDonnees[0];
 		String couleur = tabDonnees[1];
-		
+			
 		ViewGagnant.getInstance(this, vainqueur, couleur);
 	}
 
@@ -187,7 +186,7 @@ public class Client extends Observable implements Runnable {
 		
 		/* Creation de la map en fonction du layout choisi */
 		Map map = null;
-		if(layoutGame != null && layoutGame.endsWith( EXT_LAYOUT )) {
+		if(layoutGame != null && !layoutGame.equals("") && layoutGame.endsWith( EXT_LAYOUT )) {
 			try {
 				map = new Map( cheminLayout );
 			} catch (Exception e) {
@@ -195,6 +194,9 @@ public class Client extends Observable implements Runnable {
 				e.printStackTrace();
 				fermeture();
 			}
+		} else {
+			System.out.println("[CLIENT] [ERREUR] erreur lors du choix de la map ! Ce n'est pas un fichier de layout (.lay)");
+			System.exit(-1);
 		}
 		
 		/* Envoie de la map au serveur via Jackson */
@@ -248,27 +250,6 @@ public class Client extends Observable implements Runnable {
 	}
 	public void setGame(BombermanGame game) {
 		this.game = game;
-	}
-
-
-	public static void main(String[] argu) {
-
-		if (argu.length == 5) {
-			
-			String s = argu[0];
-			int p = Integer.parseInt(argu[1]);
-			String modeJeu = argu[2];
-			String strategy = argu[3];
-			int maxturn = Integer.parseInt(argu[4]);
-			
-			Client c1 = new Client(s, p, modeJeu, strategy, maxturn);
-			Thread t = new Thread(c1);
-			t.start();
-			
-		} else {
-			System.out.println("syntaxe d’appel : java client serveur port mode_de_jeu=>(normal|solo|duo) strategie_des_agents=>(random|put_bomb|break_wall|esquive) nombre_max_de_tour\n");
-		} 
-		
 	}
 
 }

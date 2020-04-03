@@ -86,7 +86,6 @@ public class ViewConnexion extends JFrame {
 		panelButton.add(buttonAnnuler);
 
 		buttonConnexion.addActionListener(evenement -> {
-			
 			this.sortie.println( fieldPseudo.getText() );
 			this.sortie.println( fieldPassword.getText() );
 			
