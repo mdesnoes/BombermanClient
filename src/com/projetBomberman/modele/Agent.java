@@ -1,77 +1,49 @@
 package com.projetBomberman.modele;
 
-import com.projetBomberman.strategy.Strategy;
+import com.projetBomberman.modele.info.AgentAction;
+import com.projetBomberman.modele.info.ColorAgent;
 
 public abstract class Agent {
+	
+	private int posX;
+	private int posY;
+	private ColorAgent color;
+	private AgentAction action;
+	private char type;
+	
+	public Agent() {
+	}
+	
 
-	private static int _compteur = 0;
-	private int _id;
-	private int _pos_x;
-	private int _pos_y;
-	private ColorAgent _color;
-	private AgentAction _action;
-	private char _type;
-	private Strategy _strategy;
-	
-	public Agent(int pos_x, int pos_y, char type, ColorAgent color, Strategy strategy) {
-		this._pos_x = pos_x;
-		this._pos_y = pos_y;
-		this._type = type;
-		this._color = color;
-		this._strategy = strategy;
-		this._id = Agent._compteur;
-		Agent._compteur++;
+	public int getPosX() {
+		return posX;
 	}
-	
-	public void setX(int x) {
-		this._pos_x = x;
+	public void setPosX(int posX) {
+		this.posX = posX;
 	}
-	
-	public void setY(int y) {
-		this._pos_y = y;
+	public int getPosY() {
+		return posY;
 	}
-	
-	public int getX() {
-		return this._pos_x;
+	public void setPosY(int posY) {
+		this.posY = posY;
 	}
-	
-	public int getY() {
-		return this._pos_y;
-	}
-
-	public int getId() {
-		return this._id;
-	}
-	
 	public ColorAgent getColor() {
-		return this._color;
+		return color;
 	}
-	
-	public char getType() {
-		return this._type;
+	public void setColor(ColorAgent color) {
+		this.color = color;
 	}
-	
 	public AgentAction getAction() {
-		return this._action;
+		return action;
 	}
-	
 	public void setAction(AgentAction action) {
-		this._action = action;
+		this.action = action;
 	}
-	
-	public Strategy getStrategy() {
-		return this._strategy;
+	public char getType() {
+		return type;
 	}
-	
-	public void setStrategy(Strategy strategy) {
-		this._strategy = strategy;
+	public void setType(char type) {
+		this.type = type;
 	}
-	
-
-	public abstract boolean isInvincible();
-	public abstract boolean canPutBomb();
-	public abstract void executer(BombermanGame bombermanGame);
-	public abstract boolean isLegalMove(BombermanGame bombGame, AgentAction action);
-	public abstract void moveAgent(AgentAction action);
 
 }

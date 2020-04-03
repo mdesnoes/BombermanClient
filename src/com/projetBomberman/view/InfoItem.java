@@ -1,6 +1,6 @@
 package com.projetBomberman.view;
 
-import com.projetBomberman.modele.ItemType;
+import com.projetBomberman.modele.info.ItemType;
 
 public class InfoItem {
 	

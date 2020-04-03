@@ -10,28 +10,22 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import com.projetBomberman.controller.ControllerBombermanGame;
+import com.projetProgReseau.client.Client;
 
 
 public class ViewGagnant extends JFrame {
 	
 	private static final long serialVersionUID = 1L;
 	
+	private static final String MSG_DECO_CLIENT = "DECONNEXION";
+	private static final String MSG_INIT_GAME = "INITIALISATION";
+	
 	private static ViewGagnant uniqueInstance = null;
 	
 	private String strLabelGagnant;
 
 
-	
-	public String getStrLabelGagnant() {
-		return strLabelGagnant;
-	}
-
-	public void setStrLabelGagnant(String strLabelGagnant) {
-		this.strLabelGagnant = strLabelGagnant;
-	}
-
-	private ViewGagnant(ControllerBombermanGame contBombGame, String str) {
+	private ViewGagnant(Client client, String str) {
 		this.strLabelGagnant = str;
 
 		setTitle("Fin du jeu");
@@ -59,12 +53,13 @@ public class ViewGagnant extends JFrame {
 		panelButton.add(buttonFermer);
 
 		buttonRecommencer.addActionListener(evenement -> {
-			contBombGame.start();
+			client.getSortie().println( MSG_INIT_GAME );
 			setVisible(false);
 		});
 		
 		buttonFermer.addActionListener(evenement -> {
-			contBombGame.quitter();
+			client.getSortie().println( MSG_DECO_CLIENT );
+			client.fermeture();
 			setVisible(false);
 		});
 		panelPrincipal.add(panelButton);
@@ -73,20 +68,26 @@ public class ViewGagnant extends JFrame {
 		setVisible(true);
 	}
 	
-	public static ViewGagnant getInstance(ControllerBombermanGame contBombGame, String victoire, String color) {
-
+	public static ViewGagnant getInstance(Client client, String victoire, String color) {
+		
 		String str = "<html><body>Victoire de l'agent <font color='"+color+"'>" + victoire + "</font> !</body></html>";
 		if(uniqueInstance == null) {
-			uniqueInstance = new ViewGagnant(contBombGame, str);
+			uniqueInstance = new ViewGagnant(client, str);
 		}
 		
 		//Si le phrase de victoire est différente, on  créer une nouvelle instance
 		if(!uniqueInstance.getStrLabelGagnant().equals(str)) {
-			uniqueInstance = new ViewGagnant(contBombGame, str);
+			uniqueInstance = new ViewGagnant(client, str);
 		}
 		
 		uniqueInstance.setVisible(true);
 		return uniqueInstance;
+	}
+	
+	
+	
+	public String getStrLabelGagnant() {
+		return strLabelGagnant;
 	}
 
 }

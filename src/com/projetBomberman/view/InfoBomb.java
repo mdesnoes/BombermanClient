@@ -1,6 +1,6 @@
 package com.projetBomberman.view;
 
-import com.projetBomberman.modele.StateBomb;
+import com.projetBomberman.modele.info.StateBomb;
 
 public class InfoBomb {
 	
