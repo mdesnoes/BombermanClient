@@ -1,5 +1,7 @@
 package com.projetProgReseau.client;
 
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
@@ -23,7 +25,7 @@ import com.projetBomberman.view.ViewModeInteractif;
 
 
 
-public class Client extends Observable implements Runnable {
+public class Client extends Observable implements Runnable, KeyListener {
 
 	private static final String EXT_LAYOUT = ".lay";
 	private static final String MSG_FIN_PARTIE = "FIN_PARTIE";
@@ -41,9 +43,9 @@ public class Client extends Observable implements Runnable {
 	private String strategy;
 	private int maxturn;
 	private BombermanGame game;
-	private ViewCommand viewCommand;
-	private ViewBombermanGame viewBombermanGame;
-	private ViewModeInteractif viewModeInteractif;
+	private ViewCommand commande;
+	private ViewBombermanGame plateau;
+	private ViewModeInteractif infoClavier;
 	
 	
 	/* 
@@ -104,17 +106,25 @@ public class Client extends Observable implements Runnable {
             		receptionEtatJeu(entree.readUTF());
         			
             		/* Création des vues */
-        			viewCommand = new ViewCommand(Client.this);
-        			viewBombermanGame = new ViewBombermanGame(map);
-        			if(modeJeu.equals("solo") || modeJeu.equals("duo")) {
-        				viewModeInteractif = ViewModeInteractif.getInstance();
+        			commande = new ViewCommand(Client.this);
+        			plateau = new ViewBombermanGame(Client.this, map);
+        			if( modeInteractif() ) {
+        				infoClavier = ViewModeInteractif.getInstance();
+        				
+        				/* Le plateau gère l'ecoute des actions sur le clavier */
+            			plateau.addKeyListener(Client.this);
         			}
 
+        			
         			/* Tant que le client n'a pas quitter le jeu, on recupere l'etat courant du jeu etc */
 	            	while(!connexion.isClosed()) {
-	            		
 	            		msg = entree.readUTF();
-						
+	            		
+	            		/* Après chaque action, on remet le focus sur le plateau pour gerer l'ecoute du clavier */
+	        			if( modeInteractif() ) {
+	        				plateau.requestFocus();
+	        			}
+	        			
 	            		if(msg.contains( MSG_FIN_PARTIE )) {
 	            			finDePartie(msg);
 	            		}
@@ -122,13 +132,11 @@ public class Client extends Observable implements Runnable {
 	            			receptionEtatJeu(msg);
 		      
 		        			/* Mise à jour du plateau du jeu */
-		        			viewBombermanGame.update(game);
+		        			plateau.update(game);
 		        			/* Mise à jour du plateau de commande */
-		        			viewCommand.update(game);
+		        			commande.update(game);
 	            		}
-						
 	            	}
-	            	
 	            	
             	} catch(EOFException e) {
              	    System.out.println("[CLIENT] [ERREUR] Le serveur est fermé ou vous avez quitter le serveur !");
@@ -143,9 +151,9 @@ public class Client extends Observable implements Runnable {
 	
 	
 	private void envoyerConfigurationJeu() {
-    	this.sortie.println(modeJeu);
-    	this.sortie.println(maxturn);
-    	this.sortie.println(strategy);
+    	this.sortie.println( this.modeJeu );
+    	this.sortie.println( this.maxturn );
+    	this.sortie.println( this.strategy );
 	}
 	
 	
@@ -153,13 +161,19 @@ public class Client extends Observable implements Runnable {
 		ObjectMapper mapper = new ObjectMapper();
 		try {
 			mapper.addMixIn(AbstractButton.class, MixIn.class); /* Pour empêcher un conflit de setter dans la classe AbstractButton */
-			game = mapper.readValue(etat, BombermanGame.class);
+			this.game = mapper.readValue(etat, BombermanGame.class);
 		} catch (Exception e) {
 			System.out.println("[CLIENT] [ERREUR] Etat du jeu non reçu");
 			e.printStackTrace();
 			fermeture();
 		}
 	}
+	
+	
+	private boolean modeInteractif() {
+		return modeJeu.equals("solo") || modeJeu.equals("duo");
+	}
+	
 	
 	private void finDePartie(String msg) {
 		String donnees = msg.split( SEP_MSG_FIN_PARTIE )[1];
@@ -169,11 +183,10 @@ public class Client extends Observable implements Runnable {
 			
 		ViewGagnant.getInstance(this, vainqueur, couleur);
 	}
-
 	
 	
 	public Map choixMapInitiale() {
-		/* Impl JFileChooser */
+		/* JFileChooser */
 		JFileChooser fc = new JFileChooser();
 		
 		String cheminLayout = "";
@@ -217,14 +230,14 @@ public class Client extends Observable implements Runnable {
 	
 	public void fermeture() {
 		try {
-			this.viewBombermanGame.setVisible(false);
-			this.viewCommand.setVisible(false);
-			if(this.viewModeInteractif != null) {
-				this.viewModeInteractif.setVisible(false);
+			this.plateau.setVisible(false);
+			this.commande.setVisible(false);
+			if(this.infoClavier != null) {
+				this.infoClavier.setVisible(false);
 			}
-	    	entree.close();
-	    	sortie.close();
-	    	connexion.close();
+	    	this.entree.close();
+	    	this.sortie.close();
+	    	this.connexion.close();
 	    	System.exit(-1);
 		} catch(IOException e) {
 			e.printStackTrace();
@@ -250,6 +263,30 @@ public class Client extends Observable implements Runnable {
 	}
 	public void setGame(BombermanGame game) {
 		this.game = game;
+	}
+	public String getModeJeu() {
+		return modeJeu;
+	}
+	public void setModeJeu(String modeJeu) {
+		this.modeJeu = modeJeu;
+	}
+
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+		if( modeInteractif() ) {
+			this.sortie.println(e.getKeyCode());
+		}
+	}
+
+
+	@Override
+	public void keyReleased(KeyEvent arg0) {
+	}
+
+
+	@Override
+	public void keyTyped(KeyEvent arg0) {
 	}
 
 }

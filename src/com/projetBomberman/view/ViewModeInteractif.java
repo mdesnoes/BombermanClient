@@ -5,8 +5,6 @@ import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
 import java.awt.Point;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
@@ -14,11 +12,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 
-public class ViewModeInteractif extends JFrame implements KeyListener {
+public class ViewModeInteractif extends JFrame {
 	
 	private static final long serialVersionUID = 1L;
 	private static ViewModeInteractif uniqueInstance = null;
-	int codeKeyPressed;
 	
 	private ViewModeInteractif() {
 		setTitle("Fenêtre de commande");
@@ -31,7 +28,7 @@ public class ViewModeInteractif extends JFrame implements KeyListener {
 		setLocation(dx,dy);
 	
 		JPanel panelPrincipal = new JPanel();
-		panelPrincipal.setLayout(new GridLayout(8,1));
+		panelPrincipal.setLayout(new GridLayout(6,1));
 		
 		JLabel labelJoueur1 = new JLabel("Touches Joueur 1 : ", JLabel.CENTER);
 		labelJoueur1.setForeground(Color.RED);
@@ -42,19 +39,17 @@ public class ViewModeInteractif extends JFrame implements KeyListener {
 		
 		
 		panelCommandeJ1.add(new JLabel(""));
-		panelCommandeJ1.add(createLabelTouche("Haut"));
+		panelCommandeJ1.add(createLabelTouche("Z"));
 		panelCommandeJ1.add(new JLabel(""));
-		panelCommandeJ1.add(createLabelTouche("Bas"));
-		panelCommandeJ1.add(createLabelTouche("Gauche"));
-		panelCommandeJ1.add(createLabelTouche("Droite"));
+		panelCommandeJ1.add(createLabelTouche("Q"));
+		panelCommandeJ1.add(createLabelTouche("S"));
+		panelCommandeJ1.add(createLabelTouche("D"));
 		
 		panelPrincipal.add(panelCommandeJ1);
 		
-		JLabel labelBombeJ1 = new JLabel("Poser Bombe : Touche 0");
+		JLabel labelBombeJ1 = new JLabel("Poser Bombe : Touche F");
 		panelPrincipal.add(labelBombeJ1);
 
-		JLabel labelStopJ1 = new JLabel("Ne rien faire : Touche 1");
-		panelPrincipal.add(labelStopJ1);
 		
 		JLabel labelJoueur2 = new JLabel("Touches Joueur 2 : ", JLabel.CENTER);
 		labelJoueur2.setForeground(Color.BLUE);
@@ -64,19 +59,17 @@ public class ViewModeInteractif extends JFrame implements KeyListener {
 		panelCommandeJ2.setLayout(new GridLayout(2,3));
 		
 		panelCommandeJ2.add(new JLabel(""));
-		panelCommandeJ2.add(createLabelTouche("Z"));
+		panelCommandeJ2.add(createLabelTouche("HAUT"));
 		panelCommandeJ2.add(new JLabel(""));
-		panelCommandeJ2.add(createLabelTouche("Q"));
-		panelCommandeJ2.add(createLabelTouche("S"));
-		panelCommandeJ2.add(createLabelTouche("D"));
+		panelCommandeJ2.add(createLabelTouche("GAUCHE"));
+		panelCommandeJ2.add(createLabelTouche("BAS"));
+		panelCommandeJ2.add(createLabelTouche("DROITE"));
 		
 		panelPrincipal.add(panelCommandeJ2);
 		
-		JLabel labelBombeJ2 = new JLabel("Poser Bombe : F");
+		JLabel labelBombeJ2 = new JLabel("Poser Bombe : Numero 0");
 		panelPrincipal.add(labelBombeJ2);
-
-		JLabel labelStopJ2 = new JLabel("Ne rien faire : A");
-		panelPrincipal.add(labelStopJ2);
+		
 		
 		setContentPane(panelPrincipal);
 		setVisible(true);
@@ -89,27 +82,12 @@ public class ViewModeInteractif extends JFrame implements KeyListener {
 		return uniqueInstance;
 	}
 	
-	public JLabel createLabelTouche(String nom) {
+	
+	private JLabel createLabelTouche(String nom) {
 		JLabel label = new JLabel(nom, JLabel.CENTER);
 		label.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
 		
 		return label;
 	}
 
-	@Override
-	public void keyPressed(KeyEvent key) {
-		this.codeKeyPressed = key.getKeyCode();
-	}
-
-	@Override
-	public void keyReleased(KeyEvent key) {	
-	}
-
-	@Override
-	public void keyTyped(KeyEvent key) {
-	}
-	
-	public int getKeyPressed() {
-		return this.codeKeyPressed;
-	}
 }

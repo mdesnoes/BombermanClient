@@ -33,6 +33,7 @@ public class ViewCommand extends JFrame {
 	private static final String MSG_PAUSE_GAME = "PAUSE";
 	private static final String MSG_ETAPE_GAME = "ETAPE";
 	private static final String MSG_DEBUT_GAME = "DEBUT";
+	private static final String MSG_MODIF_TIME = "TIME";
 	
 	private static final int SPEED_MIN = 1;	
 	private static final int SPEED_MAX = 10;
@@ -129,7 +130,7 @@ public class ViewCommand extends JFrame {
 		this.slider.setValue( VAL_SLIDER_INIT );
 
 		this.slider.addChangeListener(arg0 -> 
-			this.sortie.println( INIT_TIME / slider.getValue() )
+			this.sortie.println( MSG_MODIF_TIME + INIT_TIME / slider.getValue() )
 		);
 		
 		panelSlider.add(this.slider);

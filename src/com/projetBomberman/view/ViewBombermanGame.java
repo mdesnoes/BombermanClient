@@ -11,10 +11,14 @@ import com.projetBomberman.modele.PanelBomberman;
 import com.projetBomberman.modele.info.InfoAgent;
 import com.projetBomberman.modele.info.InfoBomb;
 import com.projetBomberman.modele.info.InfoItem;
+import com.projetProgReseau.client.Client;
 
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,9 +30,12 @@ public class ViewBombermanGame extends JFrame {
 	private static final long serialVersionUID = 1L;
 	
 	private PanelBomberman _panel;
-
+	private PrintWriter sortie;
+	private Client client;
 	
-	public ViewBombermanGame(Map map) {
+	public ViewBombermanGame(Client client, Map map) {
+		this.client = client;
+		this.sortie = client.getSortie();
 		this.createView(map);
 	}
 	
