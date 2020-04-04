@@ -12,7 +12,6 @@ public class AgentBomberman extends Agent {
 	}
 	
 	
-	
 
 	public boolean isInvincible() {
 		return isInvincible;

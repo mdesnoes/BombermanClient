@@ -23,10 +23,11 @@ public class ViewCommand extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	
-	private static final String ICONE_RESTART = "/icon_restart.png";
-	private static final String ICONE_RUN = "/icon_run.png";
-	private static final String ICONE_STEP = "/icon_step.png";
-	private static final String ICONE_PAUSE = "/icon_pause.png";
+	private static final String REP_ICONE = "/icones";
+	private static final String ICONE_RESTART = REP_ICONE + "/icon_restart.png";
+	private static final String ICONE_RUN = REP_ICONE + "/icon_run.png";
+	private static final String ICONE_STEP = REP_ICONE + "/icon_step.png";
+	private static final String ICONE_PAUSE = REP_ICONE + "/icon_pause.png";
 
 	private static final String MSG_DECO_CLIENT = "DECONNEXION";
 	private static final String MSG_INIT_GAME = "INITIALISATION";

@@ -4,6 +4,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.DataInputStream;
 import java.io.EOFException;
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -89,7 +90,8 @@ public class Client extends Observable implements Runnable, KeyListener {
             		ViewConnexion viewConnexion = new ViewConnexion(Client.this);
             		msg = entree.readUTF();
             		while(!msg.equals( CONNEXION_OK )) {
-            			viewConnexion.afficherLabelMessageErreur();
+            			viewConnexion.afficherMessageErreur(msg);
+            			
             			msg = entree.readUTF();
             		}
             		viewConnexion.setVisible(false);
@@ -138,12 +140,10 @@ public class Client extends Observable implements Runnable, KeyListener {
 	            		}
 	            	}
 	            	
-            	} catch(EOFException e) {
+            	} catch(IOException e) {
              	    System.out.println("[CLIENT] [ERREUR] Le serveur est fermé ou vous avez quitter le serveur !");
              	   	fermeture();
-                } catch (IOException e) {
-					e.printStackTrace();
-				}
+                }
             }
         });
         t.start();
@@ -188,6 +188,7 @@ public class Client extends Observable implements Runnable, KeyListener {
 	public Map choixMapInitiale() {
 		/* JFileChooser */
 		JFileChooser fc = new JFileChooser();
+		fc.setCurrentDirectory(new File( System.getProperty("user.dir") ));
 		
 		String cheminLayout = "";
 		fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
@@ -230,8 +231,12 @@ public class Client extends Observable implements Runnable, KeyListener {
 	
 	public void fermeture() {
 		try {
-			this.plateau.setVisible(false);
-			this.commande.setVisible(false);
+			if(this.plateau != null) {
+				this.plateau.setVisible(false);
+			}
+			if(this.commande != null) {
+				this.commande.setVisible(false);
+			}
 			if(this.infoClavier != null) {
 				this.infoClavier.setVisible(false);
 			}

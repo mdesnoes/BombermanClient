@@ -5,13 +5,11 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
-
-import java.io.File;
 import java.io.IOException;
-import javax.imageio.ImageIO;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 import com.projetBomberman.modele.info.AgentAction;
@@ -31,27 +29,28 @@ public class PanelBomberman extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	
-	private static final String IMG_WALL = "/wall.png";
-	private static final String IMG_BRIQUE = "/brique_2.png";
-	private static final String IMG_GRASS = "/grass.png";
-	private static final String IMG_ITEM_FIRE_UP = "/Item_FireUp.png";
-	private static final String IMG_ITEM_FIRE_DOWN = "/Item_FireDown.png";
-	private static final String IMG_ITEM_BOMB_UP = "/Item_BombUp.png";
-	private static final String IMG_ITEM_BOMB_DOWN = "/Item_BombDown.png";
-	private static final String IMG_ITEM_FIRESUIT = "/Item_FireSuit.png";
-	private static final String IMG_ITEM_SKULL = "/Item_Skull.png";
-	private static final String IMG_BOMB0 = "/Bomb_0.png";
-	private static final String IMG_BOMB1 = "/Bomb_1_jaune.png";
-	private static final String IMG_BOMB2 = "/Bomb_2_rouge.png";
-	private static final String IMG_RANGE_CENTRE = "/Range_CENTRE.png";
-	private static final String IMG_RANGE_SOUTH_FIN = "/Range_SOUTH_Fin.png";
-	private static final String IMG_RANGE_SOUTH = "/Range_SOUTH.png";
-	private static final String IMG_RANGE_NORTH_FIN = "/Range_NORTH_Fin.png";
-	private static final String IMG_RANGE_NORTH = "/Range_NORTH.png";
-	private static final String IMG_RANGE_EAST_FIN = "/Range_EAST_Fin.png";
-	private static final String IMG_RANGE_EAST = "/Range_EAST.png";	
-	private static final String IMG_RANGE_WEST_FIN = "/Range_WEST_Fin.png";
-	private static final String IMG_RANGE_WEST = "/Range_WEST.png";	
+	private static final String REP_IMG = "/image";
+	private static final String IMG_WALL = REP_IMG + "/wall.png";
+	private static final String IMG_BRIQUE = REP_IMG + "/brique_2.png";
+	private static final String IMG_GRASS = REP_IMG + "/grass.png";
+	private static final String IMG_ITEM_FIRE_UP = REP_IMG + "/Item_FireUp.png";
+	private static final String IMG_ITEM_FIRE_DOWN = REP_IMG + "/Item_FireDown.png";
+	private static final String IMG_ITEM_BOMB_UP = REP_IMG + "/Item_BombUp.png";
+	private static final String IMG_ITEM_BOMB_DOWN = REP_IMG + "/Item_BombDown.png";
+	private static final String IMG_ITEM_FIRESUIT = REP_IMG + "/Item_FireSuit.png";
+	private static final String IMG_ITEM_SKULL = REP_IMG + "/Item_Skull.png";
+	private static final String IMG_BOMB0 = REP_IMG + "/Bomb_0.png";
+	private static final String IMG_BOMB1 = REP_IMG + "/Bomb_1_jaune.png";
+	private static final String IMG_BOMB2 = REP_IMG + "/Bomb_2_rouge.png";
+	private static final String IMG_RANGE_CENTRE = REP_IMG + "/Range_CENTRE.png";
+	private static final String IMG_RANGE_SOUTH_FIN = REP_IMG + "/Range_SOUTH_Fin.png";
+	private static final String IMG_RANGE_SOUTH = REP_IMG + "/Range_SOUTH.png";
+	private static final String IMG_RANGE_NORTH_FIN = REP_IMG + "/Range_NORTH_Fin.png";
+	private static final String IMG_RANGE_NORTH = REP_IMG + "/Range_NORTH.png";
+	private static final String IMG_RANGE_EAST_FIN = REP_IMG + "/Range_EAST_Fin.png";
+	private static final String IMG_RANGE_EAST = REP_IMG + "/Range_EAST.png";
+	private static final String IMG_RANGE_WEST_FIN = REP_IMG + "/Range_WEST_Fin.png";
+	private static final String IMG_RANGE_WEST = REP_IMG + "/Range_WEST.png";
 	
 			
 	protected Color wallColor=Color.GRAY;
@@ -165,9 +164,9 @@ public class PanelBomberman extends JPanel {
 		
 		try {
 			if(infoAgent.getType() == 'R') {
-				img = ImageIO.read( getClass().getResource("/" + infoAgent.getType() + direction + this.cpt % 2 + ".png"));	
+				img = ImageIO.read( getClass().getResource( REP_IMG + "/" + infoAgent.getType() + direction + this.cpt % 2 + ".png"));	
 			}else {
-				img = ImageIO.read( getClass().getResource("/" + infoAgent.getType() + direction + this.cpt % 3 + ".png"));
+				img = ImageIO.read( getClass().getResource( REP_IMG + "/" + infoAgent.getType() + direction + this.cpt % 3 + ".png"));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

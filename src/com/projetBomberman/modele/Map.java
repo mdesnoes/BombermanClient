@@ -29,7 +29,6 @@ public class Map implements Serializable {
 	private boolean[][] start_breakable_walls;
 	private ArrayList<InfoAgent> start_agents;
 
-	
 	public Map() {
 	}
 	

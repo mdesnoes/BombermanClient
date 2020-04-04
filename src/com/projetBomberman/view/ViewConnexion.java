@@ -21,7 +21,6 @@ import com.projetProgReseau.client.Client;
 public class ViewConnexion extends JFrame {
 	
 	private static final long serialVersionUID = 1L;
-	private static final String MSG_ERREUR = "<html>Nom d'utilisateur ou mot de passe introuvable<br/>Reessayer ou creer un compte</html>";
 
     private Client client;
     private PrintWriter sortie;
@@ -103,8 +102,8 @@ public class ViewConnexion extends JFrame {
 
 	
 
-	public void afficherLabelMessageErreur() {
-		this.labelErreur.setText( MSG_ERREUR );
+	public void afficherMessageErreur(String message) {
+		this.labelErreur.setText( message );
 	}
 	
 	
