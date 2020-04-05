@@ -1,4 +1,4 @@
-import com.projetProgReseau.client.Client;
+import com.projet.client.Client;
 
 public class LancementClient {
 
